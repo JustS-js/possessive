@@ -1,11 +1,11 @@
 {
-	"required": true,
-	"package": "net.just_s.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-      "ExampleClientMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "net.just_s.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "LocalPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }
