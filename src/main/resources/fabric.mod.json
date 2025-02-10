@@ -1,31 +1,27 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "possessive",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Possessive",
+	"description": "A client addon for Armor-Poser mod which allows you to possess the armorstand.",
 	"authors": [
-		"Me!"
+		"Just_S"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://boosty.to/justs_js",
+		"sources": "https://github.com/JustS-js/possessive"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
-	"environment": "*",
+	"license": "MIT",
+	"icon": "assets/possessive/icon.png",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"com.example.ExampleMod"
-		],
 		"client": [
-			"com.example.ExampleModClient"
+			"net.just_s.PossessiveModClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
 		{
-			"config": "modid.client.mixins.json",
+			"config": "possessive.client.mixins.json",
 			"environment": "client"
 		}
 	],
@@ -33,9 +29,7 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabric-api": "*",
+		"armorposer": ">=8.0.1"
 	}
 }
