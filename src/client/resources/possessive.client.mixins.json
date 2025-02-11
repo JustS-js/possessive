@@ -3,7 +3,13 @@
   "package": "net.just_s.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "LocalPlayerMixin"
+    "ClientPacketListenerMixin",
+    "EntityMixin",
+    "GameRendererMixin",
+    "LevelRendererMixin",
+    "MinecraftMixin",
+    "MultiPlayerGameModeMixin",
+    "OptionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

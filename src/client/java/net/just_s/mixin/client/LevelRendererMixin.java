@@ -1,0 +1,43 @@
+package net.just_s.mixin.client;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.just_s.PossessiveModClient;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
+
+import static org.spongepowered.asm.mixin.injection.callback.LocalCapture.CAPTURE_FAILHARD;
+
+@Environment(EnvType.CLIENT)
+@Mixin(LevelRenderer.class)
+public abstract class LevelRendererMixin {
+
+    @Shadow protected abstract void renderEntity(Entity entity, double d, double e, double f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource);
+
+    @Shadow @Final private RenderBuffers renderBuffers;
+
+    @Inject(method = "renderEntities", at = @At("TAIL"), locals = CAPTURE_FAILHARD)
+    private void possessive$onRenderEntities(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Camera camera, DeltaTracker deltaTracker, List<Entity> list, CallbackInfo ci) {
+        if (PossessiveModClient.cameraHandler.isEnabled()) {
+            Vec3 position = camera.getPosition();
+            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
+
+            renderEntity(Minecraft.getInstance().player, position.x, position.y, position.z, partialTick, poseStack, renderBuffers.bufferSource());
+        }
+    }
+}
