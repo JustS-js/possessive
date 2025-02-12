@@ -1,10 +1,16 @@
 package net.just_s.camera;
 
+import com.mojang.blaze3d.resource.CrossFrameResourcePool;
 import net.just_s.PossessiveModClient;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.LevelTargetBundle;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
@@ -12,6 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class AstralProjectionCamera extends AbstractCamera {
+    private static PostChain astralShader;
+    private static final CrossFrameResourcePool RESOURCE_POOL = new CrossFrameResourcePool(3);
+
     public AstralProjectionCamera(Minecraft minecraft, Entity entity) {
         super(minecraft, -100);
 
@@ -113,5 +122,21 @@ public class AstralProjectionCamera extends AbstractCamera {
             return null;
         }
         return super.onSetScreen(screen);
+    }
+
+    @Override
+    public void onCameraShader(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        if (astralShader == null) {
+            astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
+                    ResourceLocation.fromNamespaceAndPath(
+                            PossessiveModClient.MOD_ID, "astral"
+                    ),
+                    LevelTargetBundle.MAIN_TARGETS
+            );
+        }
+        if (astralShader == null) {
+            return;
+        }
+        astralShader.process(Minecraft.getInstance().getMainRenderTarget(), RESOURCE_POOL);
     }
 }

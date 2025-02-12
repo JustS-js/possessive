@@ -5,7 +5,9 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.just_s.PossessiveModClient;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.PlayerModel;
@@ -166,6 +168,10 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     public void onContinueAttack() {
+        // noop
+    }
+
+    public void onCameraShader(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         // noop
     }
 
