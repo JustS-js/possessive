@@ -1,4 +1,6 @@
 {
-  "key.possessive.test": "Test Keybind",
-  "category.possessive": "Possessive"
+  "key.possessive.possess": "Possess",
+  "category.possessive": "Possessive",
+  "armorposer.gui.label.animate_button": "Animate Movement",
+  "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand"
 }

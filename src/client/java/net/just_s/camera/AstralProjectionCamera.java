@@ -1,6 +1,9 @@
 package net.just_s.camera;
 
+import net.just_s.PossessiveModClient;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
@@ -101,5 +104,14 @@ public class AstralProjectionCamera extends AbstractCamera {
     @Override
     public boolean isMovingSlowly() {
         return false;
+    }
+
+    @Override
+    public Screen onSetScreen(Screen screen) {
+        if (screen instanceof InventoryScreen) {
+            PossessiveModClient.LOGGER.info("tried to open inventory");
+            return null;
+        }
+        return super.onSetScreen(screen);
     }
 }

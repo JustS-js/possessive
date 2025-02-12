@@ -190,10 +190,6 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     public Screen onSetScreen(Screen screen) {
-        if (screen instanceof InventoryScreen) {
-            PossessiveModClient.LOGGER.info("tried to open inventory");
-            return null;
-        }
         return screen;
     }
 

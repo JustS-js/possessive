@@ -37,21 +37,13 @@ public class PossessiveModClient implements ClientModInitializer {
 	public static ArmorStand targetedArmorStand = null;
 	private static float animationAngle = 0f;
 
-	private static KeyMapping keyBinding;
+
 
 	public static CameraHandler cameraHandler = new CameraHandler();
 
 	@Override
 	public void onInitializeClient() {
-		keyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-				"key.possessive.test", // The translation key of the keybinding's name
-				InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-				GLFW.GLFW_KEY_R, // The keycode of the key
-				"category.possessive" // The translation key of the keybinding's category.
-		));
-
-		ClientTickEvents.END_CLIENT_TICK.register(PossessiveModClient::possessKeyPress);
-
+		ModKeyMappings.registerModKeyMappings();
 		ClientTickEvents.START_CLIENT_TICK.register(PossessiveModClient::preTick);
 		ClientTickEvents.END_CLIENT_TICK.register(PossessiveModClient::postTick);
 	}
@@ -79,54 +71,6 @@ public class PossessiveModClient implements ClientModInitializer {
 
 	private static void postTick(Minecraft client) {
 		// noop
-	}
-
-	private static void possessKeyPress(Minecraft client) {
-		if (client.player == null) {
-			return;
-		}
-
-		boolean isAstral = cameraHandler.getCamera() instanceof AstralProjectionCamera;
-		while (keyBinding.consumeClick()) {
-			if (client.options.keyShift.isDown()) {
-				if (isAstral) {
-					return;
-				}
-				cameraHandler.enableCamera(
-						new AstralProjectionCamera(client, client.cameraEntity)
-				);
-				client.player.displayClientMessage(Component.literal("astral projected!"), false);
-				return;
-			}
-			if (!isAstral) {
-				return;
-			}
-
-			Entity entity = cameraHandler.getCamera().getCrosshairEntity(
-					PossessiveModClient::possessableEntity, 3
-			);
-			if (entity == null) {
-				return;
-			}
-
-			cameraHandler.disableCamera();
-			switch (entity) {
-				case LocalPlayer player -> {
-					client.player.displayClientMessage(Component.literal("returned in body!"), false);
-				}
-				case ArmorStand armorStand -> {
-					cameraHandler.enableCamera(
-							new ArmorStandCamera(client, armorStand)
-					);
-					client.player.displayClientMessage(Component.literal("possessed!"), false);
-				}
-				default -> throw new IllegalStateException("Unexpected value: " + entity);
-			}
-		}
-	}
-
-	private static boolean possessableEntity(Entity e) {
-		return (e instanceof LocalPlayer && e.equals(Minecraft.getInstance().player)) || (e instanceof ArmorStand);
 	}
 
 //	private static void sendPossessedMovementIfNeeded(Minecraft client) {

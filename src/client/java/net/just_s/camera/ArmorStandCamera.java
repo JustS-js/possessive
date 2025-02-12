@@ -1,12 +1,15 @@
 package net.just_s.camera;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrbysco.armorposer.client.gui.ArmorStandScreen;
 import com.mrbysco.armorposer.data.SyncData;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.ArmorStandArmorModel;
 import net.minecraft.client.model.ArmorStandModel;
 import net.minecraft.client.model.PlayerModel;
@@ -26,6 +29,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
+    private boolean animateMoving = false;
+
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
         super(client, -120);
 
@@ -36,6 +41,10 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setAbilityToChangePerspective(true);
         this.setRenderHand(true);
         this.setRenderBlockOutline(true);
+    }
+
+    public ArmorStand getPossessed() {
+        return possessedArmorStand;
     }
 
     @Override
@@ -106,5 +115,21 @@ public class ArmorStandCamera extends AbstractCamera {
         armorStandModel.rightArm.zRot = 0.1F;
 
         armorStandArm.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(ArmorStandRenderer.DEFAULT_SKIN_LOCATION)), i, OverlayTexture.NO_OVERLAY);
+    }
+
+    @Override
+    public Screen onSetScreen(Screen screen) {
+        if (screen instanceof InventoryScreen) {
+            return new AnimatableArmorStandScreen(this);
+        }
+        return super.onSetScreen(screen);
+    }
+
+    public boolean shouldAnimateMoving() {
+        return animateMoving;
+    }
+
+    public void setAnimateMoving(boolean animateMoving) {
+        this.animateMoving = animateMoving;
     }
 }
