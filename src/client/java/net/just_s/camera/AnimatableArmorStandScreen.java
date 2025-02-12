@@ -2,7 +2,6 @@ package net.just_s.camera;
 
 import com.mrbysco.armorposer.client.gui.ArmorStandScreen;
 import com.mrbysco.armorposer.client.gui.widgets.ToggleButton;
-import net.just_s.PossessiveModClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.language.I18n;

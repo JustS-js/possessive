@@ -22,6 +22,9 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -29,7 +32,14 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
+
     private boolean animateMoving = false;
+    private static float animationSpeed = 0.3f;
+    private static float animationMultiplier = 3;
+    private static float animationMaxAngle = 30f;
+    private float animationAngle = 0f;
+    private float animationIntensity = 0;
+    private float animationState = 0;
 
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
         super(client, -120);
@@ -58,8 +68,9 @@ public class ArmorStandCamera extends AbstractCamera {
         boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4); // || positionReminder >= 20;
         boolean shouldUpdateAngle = dYRot != 0.0 || dXRot != 0.0;
 
+        this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            this.sendCompound(this.generateCompoundFromCamera());
+            this.sendCompound(this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ()));
         }
 
         return false;
@@ -73,11 +84,87 @@ public class ArmorStandCamera extends AbstractCamera {
 		ClientPlayNetworking.send(new ArmorStandSyncPayload(data));
     }
 
-    private CompoundTag generateCompoundFromCamera() {
-        CompoundTag compoundTag = possessedArmorStand.saveWithoutId(new CompoundTag()).copy();
+    private CompoundTag generateCompoundFromCamera(double x, double y, double z) {
+        CompoundTag original = possessedArmorStand.saveWithoutId(new CompoundTag());
+        CompoundTag compoundTag = new CompoundTag();
 
-        PossessiveModClient.LOGGER.info(compoundTag.toString());
-        return compoundTag;
+        CompoundTag poseTag = new CompoundTag();
+        ListTag poseHeadTag = new ListTag();
+        poseHeadTag.add(FloatTag.valueOf(this.getXRot()));
+        poseHeadTag.add(FloatTag.valueOf(this.yHeadRot - this.yBodyRot));
+        float headTilt = 0;
+        if (original.contains("Pose")) {
+            CompoundTag originalPoseTag = original.getCompound("Pose");
+            if (originalPoseTag.contains("Head")) {
+                ListTag originalHeadTag = originalPoseTag.getList("Head", 5);
+                if (originalHeadTag.size() > 2) {
+                    headTilt = originalHeadTag.getFloat(2);
+                }
+            }
+        }
+        poseHeadTag.add(FloatTag.valueOf(headTilt));
+        poseTag.put("Head", poseHeadTag);
+        if (shouldAnimateMoving()) {
+            poseTag.merge(getAnimatedPoseState());
+        }
+        compoundTag.put("Pose", poseTag);
+
+        ListTag rotationTag = new ListTag();
+		rotationTag.add(FloatTag.valueOf(this.yBodyRot));
+        rotationTag.add(FloatTag.valueOf(0));
+        compoundTag.put("Rotation", rotationTag);
+
+        ListTag positionOffset = new ListTag();
+        positionOffset.add(DoubleTag.valueOf(x));
+        positionOffset.add(DoubleTag.valueOf(y));
+        positionOffset.add(DoubleTag.valueOf(z));
+        compoundTag.put("Pos", positionOffset);
+
+        return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
+    }
+
+    public void tickAnimation() {
+        animationAngle = (float) ((animationAngle + animationSpeed) % (2 * Math.PI));
+        animationIntensity = Math.clamp((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 0f, 1f);
+        animationState = (float) Math.sin(animationAngle) * animationMaxAngle * animationIntensity;
+        if (Float.compare(0f, animationIntensity) == 1) {
+            animationAngle = 0;
+        }
+    }
+
+    private CompoundTag getAnimatedPoseState() {
+        CompoundTag poseTag = new CompoundTag();
+        ListTag poseBodyTag = new ListTag();
+        poseBodyTag.add(FloatTag.valueOf(0));
+        poseBodyTag.add(FloatTag.valueOf(0));
+        poseBodyTag.add(FloatTag.valueOf(0));
+        poseTag.put("Body", poseBodyTag);
+
+        ListTag poseLeftLegTag = new ListTag();
+        poseLeftLegTag.add(FloatTag.valueOf(animationState * -1));
+        poseLeftLegTag.add(FloatTag.valueOf(0));
+        poseLeftLegTag.add(FloatTag.valueOf(0));
+        poseTag.put("LeftLeg", poseLeftLegTag);
+
+        ListTag poseRightLegTag = new ListTag();
+        poseRightLegTag.add(FloatTag.valueOf(animationState));
+        poseRightLegTag.add(FloatTag.valueOf(0));
+        poseRightLegTag.add(FloatTag.valueOf(0));
+        poseTag.put("RightLeg", poseRightLegTag);
+
+        ListTag poseLeftArmTag = new ListTag();
+        poseLeftArmTag.add(FloatTag.valueOf(animationState));
+        poseLeftArmTag.add(FloatTag.valueOf(0));
+        poseLeftArmTag.add(FloatTag.valueOf(0));
+        poseTag.put("LeftArm", poseLeftArmTag);
+
+        ListTag poseRightArmTag = new ListTag();
+        poseRightArmTag.add(FloatTag.valueOf(animationState * -1));
+        poseRightArmTag.add(FloatTag.valueOf(0));
+        poseRightArmTag.add(FloatTag.valueOf(0));
+        poseTag.put("RightArm", poseRightArmTag);
+
+        return poseTag;
     }
 
     @Override
