@@ -7,9 +7,12 @@
     "EntityMixin",
     "GameRendererMixin",
     "LevelRendererMixin",
+    "LocalPlayerAccessor",
+    "LocalPlayerMixin",
     "MinecraftMixin",
     "MultiPlayerGameModeMixin",
-    "OptionsMixin"
+    "OptionsMixin",
+    "PlayerRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

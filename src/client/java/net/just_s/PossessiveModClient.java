@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.just_s.camera.AbstractCamera;
+import net.just_s.camera.ArmorStandCamera;
 import net.just_s.camera.AstralProjectionCamera;
 import net.just_s.camera.CameraHandler;
 import net.minecraft.client.KeyMapping;
@@ -85,29 +86,48 @@ public class PossessiveModClient implements ClientModInitializer {
 		if (client.player == null) {
 			return;
 		}
+
+		boolean isAstral = cameraHandler.getCamera() instanceof AstralProjectionCamera;
 		while (keyBinding.consumeClick()) {
 			if (client.options.keyShift.isDown()) {
-				if (cameraHandler.isEnabled()) {
+				if (isAstral) {
 					return;
 				}
 				cameraHandler.enableCamera(
-						new AstralProjectionCamera(client, client.player)
+						new AstralProjectionCamera(client, client.cameraEntity)
 				);
 				client.player.displayClientMessage(Component.literal("astral projected!"), false);
 				return;
 			}
-			if (!cameraHandler.isEnabled()) {
+			if (!isAstral) {
 				return;
 			}
 
-			LocalPlayer entity = (LocalPlayer) cameraHandler.getCamera().getCrosshairEntity((e) -> e instanceof LocalPlayer, 3);
-			if (entity == null || !entity.equals(client.player)) {
+			Entity entity = cameraHandler.getCamera().getCrosshairEntity(
+					PossessiveModClient::possessableEntity, 3
+			);
+			if (entity == null) {
 				return;
 			}
 
 			cameraHandler.disableCamera();
-			client.player.displayClientMessage(Component.literal("returned in body!"), false);
+			switch (entity) {
+				case LocalPlayer player -> {
+					client.player.displayClientMessage(Component.literal("returned in body!"), false);
+				}
+				case ArmorStand armorStand -> {
+					cameraHandler.enableCamera(
+							new ArmorStandCamera(client, armorStand)
+					);
+					client.player.displayClientMessage(Component.literal("possessed!"), false);
+				}
+				default -> throw new IllegalStateException("Unexpected value: " + entity);
+			}
 		}
+	}
+
+	private static boolean possessableEntity(Entity e) {
+		return (e instanceof LocalPlayer && e.equals(Minecraft.getInstance().player)) || (e instanceof ArmorStand);
 	}
 
 //	private static void sendPossessedMovementIfNeeded(Minecraft client) {

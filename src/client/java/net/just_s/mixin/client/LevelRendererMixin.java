@@ -40,4 +40,13 @@ public abstract class LevelRendererMixin {
             renderEntity(Minecraft.getInstance().player, position.x, position.y, position.z, partialTick, poseStack, renderBuffers.bufferSource());
         }
     }
+
+    @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
+    private void possessive$onRenderEntity(Entity entity, double d, double e, double f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, CallbackInfo ci) {
+        if (PossessiveModClient.cameraHandler.isEnabled()) {
+            if (!PossessiveModClient.cameraHandler.getCamera().shouldRenderEntity(entity)) {
+                ci.cancel();
+            }
+        }
+    }
 }

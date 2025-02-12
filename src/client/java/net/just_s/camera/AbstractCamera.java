@@ -1,15 +1,27 @@
 package net.just_s.camera;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.just_s.PossessiveModClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerLinks;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -67,8 +79,6 @@ public abstract class AbstractCamera extends LocalPlayer {
         setId(id);
         // Otherwise input is frozen until timeout
         setClientLoaded(true);
-        // Lets us fly
-        getAbilities().flying = true;
         input = new KeyboardInput(client.options);
     }
 
@@ -164,6 +174,26 @@ public abstract class AbstractCamera extends LocalPlayer {
         // noop
     }
 
+    // copied from PlayerRenderer.renderHand()
+    public void onRenderHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl) {
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        LocalPlayer entityToRender = Minecraft.getInstance().player;
+        PlayerRenderer entityRenderer = (PlayerRenderer) entityRenderDispatcher.getRenderer(entityToRender);
+
+        PlayerModel playerModel = entityRenderer.getModel();
+        modelPart.resetPose();
+        modelPart.visible = true;
+        playerModel.leftSleeve.visible = bl;
+        playerModel.rightSleeve.visible = bl;
+        playerModel.leftArm.zRot = -0.1F;
+        playerModel.rightArm.zRot = 0.1F;
+        modelPart.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(resourceLocation)), i, OverlayTexture.NO_OVERLAY);
+    }
+
+    public boolean onSendPosition() {
+        return false;
+    }
+
     public Screen onSetScreen(Screen screen) {
         if (screen instanceof InventoryScreen) {
             PossessiveModClient.LOGGER.info("tried to open inventory");
@@ -182,5 +212,9 @@ public abstract class AbstractCamera extends LocalPlayer {
 
     public InteractionResult onInteractAt(Player player, Entity entity, EntityHitResult hitResult, InteractionHand hand) {
         return InteractionResult.PASS;
+    }
+
+    public boolean shouldRenderEntity(Entity entity) {
+        return true;
     }
 }

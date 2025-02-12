@@ -11,6 +11,8 @@ public class AstralProjectionCamera extends AbstractCamera {
     public AstralProjectionCamera(Minecraft minecraft, Entity entity) {
         super(minecraft, -100);
 
+        // Lets us fly
+        getAbilities().flying = true;
         setPose(Pose.SWIMMING);
         this.copyPosition(entity);
     }
