@@ -17,7 +17,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.protocol.Packet;
@@ -152,10 +151,6 @@ public abstract class AbstractCamera extends LocalPlayer {
 
     public void setAbilityToChangePerspective(boolean changeablePerspective) {
         this.changeablePerspective = changeablePerspective;
-    }
-
-    public void onInventoryOpen() {
-        // noop
     }
 
     public void onStartAttack() {

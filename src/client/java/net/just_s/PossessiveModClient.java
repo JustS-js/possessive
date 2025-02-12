@@ -61,14 +61,13 @@ public class PossessiveModClient implements ClientModInitializer {
 			// Prevent player from being controlled when freecam is enabled
 			if (client.player != null && client.player.input instanceof KeyboardInput) {
 				ClientInput input = new ClientInput();
-				Input keyPresses = client.player.input.keyPresses;
 				input.keyPresses = new Input(
 						false,
 						false,
 						false,
 						false,
 						false,
-						keyPresses.shift(),
+						true,
 						false
 				);
 				client.player.input = input;

@@ -6,6 +6,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class AstralProjectionCamera extends AbstractCamera {
     public AstralProjectionCamera(Minecraft minecraft, Entity entity) {
@@ -14,7 +15,36 @@ public class AstralProjectionCamera extends AbstractCamera {
         // Lets us fly
         getAbilities().flying = true;
         setPose(Pose.SWIMMING);
+        this.moveInfrontOf(entity);
+        this.addDeltaMovement(Vec3.ZERO.add(0, 1, 0));
+    }
+
+    private void moveInfrontOf(Entity entity) {
         this.copyPosition(entity);
+        CameraPosition position = new CameraPosition(this);
+        this.moveForwardUntilCollision(position, -0.5);
+    }
+
+    private boolean moveForwardUntilCollision(CameraPosition position, double maxDistance) {
+        boolean negative = maxDistance < 0;
+        maxDistance = negative ? -1 * maxDistance : maxDistance;
+        double increment = 0.1;
+
+        // Move forward by increment until we reach maxDistance or hit a collision
+        for (double distance = 0.0; distance < maxDistance; distance += increment) {
+            CameraPosition oldPosition = new CameraPosition(this);
+
+            position.moveForward(negative ? -1 * increment : increment);
+            applyPosition(position);
+
+            if (!wouldNotSuffocateAtTargetPose(getPose())) {
+                // Revert to last non-colliding position and return whether we were unable to move at all
+                applyPosition(oldPosition);
+                return distance > 0;
+            }
+        }
+
+        return true;
     }
 
     @Override

@@ -105,7 +105,6 @@ public class ArmorStandCamera extends AbstractCamera {
         armorStandModel.leftArm.zRot = -0.1F;
         armorStandModel.rightArm.zRot = 0.1F;
 
-        resourceLocation =
-        armorStandArm.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(resourceLocation)), i, OverlayTexture.NO_OVERLAY);
+        armorStandArm.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(ArmorStandRenderer.DEFAULT_SKIN_LOCATION)), i, OverlayTexture.NO_OVERLAY);
     }
 }
