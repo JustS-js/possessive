@@ -126,14 +126,12 @@ public class AstralProjectionCamera extends AbstractCamera {
 
     @Override
     public void onCameraShader(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (astralShader == null) {
-            astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
-                    ResourceLocation.fromNamespaceAndPath(
-                            PossessiveModClient.MOD_ID, "astral"
-                    ),
-                    LevelTargetBundle.MAIN_TARGETS
-            );
-        }
+        astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
+                ResourceLocation.fromNamespaceAndPath(
+                        PossessiveModClient.MOD_ID, "astral"
+                ),
+                LevelTargetBundle.MAIN_TARGETS
+        );
         if (astralShader == null) {
             return;
         }

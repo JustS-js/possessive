@@ -15,6 +15,7 @@
     { "name": "OutSize",     "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
     { "name": "RedMatrix",   "type": "float",     "count": 3,  "values": [ 1.0, 0.0, 0.0 ] },
     { "name": "GreenMatrix", "type": "float",     "count": 3,  "values": [ 0.0, 1.0, 0.0 ] },
-    { "name": "BlueMatrix",  "type": "float",     "count": 3,  "values": [ 0.0, 0.0, 1.0 ] }
+    { "name": "BlueMatrix",  "type": "float",     "count": 3,  "values": [ 0.0, 0.0, 1.0 ] },
+    { "name": "Threshold",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] }
   ]
 }
