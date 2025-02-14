@@ -4,32 +4,20 @@
   },
   "passes": [
     {
-      "program": "possessive:post/color_shift",
+      "program": "possessive:post/limbo",
       "inputs": [
         {
-          "sampler_name": "In",
+          "sampler_name": "Main",
+          "target": "minecraft:main"
+        },
+        {
+          "sampler_name": "MainDepth",
           "target": "minecraft:main",
-          "bilinear": true
+          "use_depth_buffer": true
         }
       ],
       "output": "swap",
       "uniforms": [
-        {
-          "name": "RedMatrix",
-          "values": [ 0.2126,0.7512,0.0722 ]
-        },
-        {
-          "name": "GreenMatrix",
-          "values": [ 0.2126,0.7512,0.0722 ]
-        },
-        {
-          "name": "BlueMatrix",
-          "values": [ 0.2126,0.7512,0.0722 ]
-        },
-        {
-          "name": "Threshold",
-          "values": [ 0.12, 0.15 ]
-        }
       ]
     },
     {
