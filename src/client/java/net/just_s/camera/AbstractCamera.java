@@ -2,6 +2,7 @@ package net.just_s.camera;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.just_s.PossessiveModClient;
@@ -17,6 +18,7 @@ import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -171,7 +173,13 @@ public abstract class AbstractCamera extends LocalPlayer {
         // noop
     }
 
-    public void onCameraShader(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    /* This code runs INSTEAD of transparency.json!
+     * That means it need Fabulous graphic settings
+     * and you might want to add "minecraft:post/transparency" as the first pass
+     * for your shader.
+     * For examples see assets/post_shader/astral.json
+     */
+    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
         // noop
     }
 

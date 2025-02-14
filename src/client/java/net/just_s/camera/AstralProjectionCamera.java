@@ -1,10 +1,9 @@
 package net.just_s.camera;
 
-import com.mojang.blaze3d.resource.CrossFrameResourcePool;
+import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import net.just_s.PossessiveModClient;
-import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.LevelTargetBundle;
@@ -18,8 +17,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class AstralProjectionCamera extends AbstractCamera {
-    private static PostChain astralShader;
-    private static final CrossFrameResourcePool RESOURCE_POOL = new CrossFrameResourcePool(3);
+    private GraphicsStatus storedGraphicStatus;
+    private double savedGamma;
 
     public AstralProjectionCamera(Minecraft minecraft, Entity entity) {
         super(minecraft, -100);
@@ -57,6 +56,28 @@ public class AstralProjectionCamera extends AbstractCamera {
         }
 
         return true;
+    }
+
+    @Override
+    public void spawn() {
+        super.spawn();
+        storedGraphicStatus = this.minecraft.options.graphicsMode().get();
+        if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
+            this.minecraft.options.graphicsMode().set(GraphicsStatus.FABULOUS);
+            this.minecraft.options.save();
+        }
+        savedGamma = this.minecraft.options.gamma().get();
+        this.minecraft.options.gamma().set(100d);
+    }
+
+    @Override
+    public void despawn() {
+        super.despawn();
+        this.minecraft.options.gamma().set(savedGamma);
+        if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
+            this.minecraft.options.graphicsMode().set(storedGraphicStatus);
+            this.minecraft.options.save();
+        }
     }
 
     @Override
@@ -125,8 +146,8 @@ public class AstralProjectionCamera extends AbstractCamera {
     }
 
     @Override
-    public void onCameraShader(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
+    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
+        PostChain astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
                 ResourceLocation.fromNamespaceAndPath(
                         PossessiveModClient.MOD_ID, "astral"
                 ),
@@ -135,6 +156,6 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (astralShader == null) {
             return;
         }
-        astralShader.process(Minecraft.getInstance().getMainRenderTarget(), RESOURCE_POOL);
+        astralShader.addToFrame(frameGraphBuilder, width, height, targetBundle);
     }
 }

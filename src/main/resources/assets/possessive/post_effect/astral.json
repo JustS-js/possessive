@@ -1,10 +1,11 @@
 {
   "targets": {
+    "final": {},
     "swap": {}
   },
   "passes": [
     {
-      "program": "possessive:post/limbo",
+      "program": "minecraft:post/transparency",
       "inputs": [
         {
           "sampler_name": "Main",
@@ -14,9 +15,114 @@
           "sampler_name": "MainDepth",
           "target": "minecraft:main",
           "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Translucent",
+          "target": "minecraft:translucent"
+        },
+        {
+          "sampler_name": "TranslucentDepth",
+          "target": "minecraft:translucent",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "ItemEntity",
+          "target": "minecraft:item_entity"
+        },
+        {
+          "sampler_name": "ItemEntityDepth",
+          "target": "minecraft:item_entity",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Particles",
+          "target": "minecraft:particles"
+        },
+        {
+          "sampler_name": "ParticlesDepth",
+          "target": "minecraft:particles",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Clouds",
+          "target": "minecraft:clouds"
+        },
+        {
+          "sampler_name": "CloudsDepth",
+          "target": "minecraft:clouds",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Weather",
+          "target": "minecraft:weather"
+        },
+        {
+          "sampler_name": "WeatherDepth",
+          "target": "minecraft:weather",
+          "use_depth_buffer": true
         }
       ],
-      "output": "swap",
+      "output": "swap"
+    },
+    {
+      "program": "possessive:post/limbo",
+      "inputs": [
+        {
+          "sampler_name": "Main",
+          "target": "swap"
+        },
+        {
+          "sampler_name": "MainDepth",
+          "target": "minecraft:main",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Translucent",
+          "target": "minecraft:translucent"
+        },
+        {
+          "sampler_name": "TranslucentDepth",
+          "target": "minecraft:translucent",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "ItemEntity",
+          "target": "minecraft:item_entity"
+        },
+        {
+          "sampler_name": "ItemEntityDepth",
+          "target": "minecraft:item_entity",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Particles",
+          "target": "minecraft:particles"
+        },
+        {
+          "sampler_name": "ParticlesDepth",
+          "target": "minecraft:particles",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Clouds",
+          "target": "minecraft:clouds"
+        },
+        {
+          "sampler_name": "CloudsDepth",
+          "target": "minecraft:clouds",
+          "use_depth_buffer": true
+        },
+        {
+          "sampler_name": "Weather",
+          "target": "minecraft:weather"
+        },
+        {
+          "sampler_name": "WeatherDepth",
+          "target": "minecraft:weather",
+          "use_depth_buffer": true
+        }
+      ],
+      "output": "final",
       "uniforms": [
       ]
     },
@@ -25,12 +131,10 @@
       "inputs": [
         {
           "sampler_name": "In",
-          "target": "swap"
+          "target": "final"
         }
       ],
-      "output": "minecraft:main",
-      "uniforms": [
-      ]
+      "output": "minecraft:main"
     }
   ]
 }

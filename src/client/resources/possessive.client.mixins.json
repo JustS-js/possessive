@@ -12,7 +12,8 @@
     "MinecraftMixin",
     "MultiPlayerGameModeMixin",
     "OptionsMixin",
-    "PlayerRendererMixin"
+    "PlayerRendererMixin",
+    "UnitDoubleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

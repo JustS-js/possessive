@@ -1,18 +1,19 @@
 {
-  "blend": {
-    "func": "add",
-    "srcrgb": "one",
-    "dstrgb": "zero"
-  },
   "vertex": "minecraft:post/screenquad",
   "fragment": "possessive:post/limbo",
   "samplers": [
-    {
-      "name": "MainSampler"
-    },
-    {
-      "name": "MainDepthSampler"
-    }
+    { "name": "MainSampler" },
+    { "name": "MainDepthSampler" },
+    { "name": "TranslucentSampler" },
+    { "name": "TranslucentDepthSampler" },
+    { "name": "ItemEntitySampler" },
+    { "name": "ItemEntityDepthSampler" },
+    { "name": "ParticlesSampler" },
+    { "name": "ParticlesDepthSampler" },
+    { "name": "CloudsSampler" },
+    { "name": "CloudsDepthSampler" },
+    { "name": "WeatherSampler" },
+    { "name": "WeatherDepthSampler" }
   ],
   "uniforms": [
     { "name": "ProjMat",     "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },

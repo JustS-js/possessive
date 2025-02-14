@@ -23,7 +23,7 @@ public class PossessiveModClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModKeyMappings.registerModKeyMappings();
 		ClientTickEvents.START_CLIENT_TICK.register(PossessiveModClient::preTick);
-		HudRenderCallback.EVENT.register(PossessiveModClient::cameraShaderApplier);
+		//HudRenderCallback.EVENT.register(PossessiveModClient::cameraShaderApplier);
 	}
 
 	private static void preTick(Minecraft client) {
@@ -47,9 +47,9 @@ public class PossessiveModClient implements ClientModInitializer {
 		}
 	}
 
-	private static void cameraShaderApplier(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+	/*private static void cameraShaderApplier(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
 		if (cameraHandler.isEnabled()) {
 			cameraHandler.getCamera().onCameraShader(guiGraphics, deltaTracker);
 		}
-	}
+	}*/
 }

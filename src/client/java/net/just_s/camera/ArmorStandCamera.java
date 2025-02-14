@@ -56,9 +56,8 @@ public class ArmorStandCamera extends AbstractCamera {
             return;
         }
 
-        // todo: fix if now NBT found
         float preBodyYRot = 0;
-        float preHeadXRot = 0;
+        float preHeadXRot = armorStand.getYRot();
         float preHeadYRot = 0;
 
         CompoundTag compoundTag = armorStand.saveWithoutId(new CompoundTag());
@@ -147,8 +146,6 @@ public class ArmorStandCamera extends AbstractCamera {
         positionOffset.add(DoubleTag.valueOf(y));
         positionOffset.add(DoubleTag.valueOf(z));
         compoundTag.put("Pos", positionOffset);
-
-        LOGGER.info(rotationTag.toString() + " | " + poseHeadTag.toString());
 
         return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
     }
