@@ -1,20 +1,16 @@
 package net.just_s.camera;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrbysco.armorposer.client.gui.ArmorStandScreen;
 import com.mrbysco.armorposer.data.SyncData;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.ArmorStandArmorModel;
-import net.minecraft.client.model.ArmorStandModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
@@ -51,6 +47,38 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setAbilityToChangePerspective(true);
         this.setRenderHand(true);
         this.setRenderBlockOutline(true);
+    }
+
+    @Override
+    public void copyPosition(Entity entity) {
+        if (!(entity instanceof ArmorStand armorStand)) {
+            super.copyPosition(entity);
+            return;
+        }
+
+        // todo: fix if now NBT found
+        float preBodyYRot = 0;
+        float preHeadXRot = 0;
+        float preHeadYRot = 0;
+
+        CompoundTag compoundTag = armorStand.saveWithoutId(new CompoundTag());
+        if (compoundTag.contains("Rotation")) {
+            ListTag rotationTag = compoundTag.getList("Rotation", 5);
+            preBodyYRot = rotationTag.getFloat(0);
+        }
+        if (compoundTag.contains("Pose")) {
+            CompoundTag poseTag = compoundTag.getCompound("Pose");
+            if (poseTag.contains("Head")) {
+                ListTag headTag = poseTag.getList("Head", 5);
+                preHeadYRot = headTag.getFloat(0);
+                preHeadXRot = headTag.getFloat(1) + preBodyYRot;
+            }
+        }
+
+        CameraPosition position = new CameraPosition(entity.getX(), entity.getY(), entity.getZ());
+        position.setRotation(preHeadXRot, preHeadYRot);
+        applyPosition(position);
+        this.yBodyRot = preBodyYRot;
     }
 
     public ArmorStand getPossessed() {
@@ -119,6 +147,8 @@ public class ArmorStandCamera extends AbstractCamera {
         positionOffset.add(DoubleTag.valueOf(y));
         positionOffset.add(DoubleTag.valueOf(z));
         compoundTag.put("Pos", positionOffset);
+
+        LOGGER.info(rotationTag.toString() + " | " + poseHeadTag.toString());
 
         return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
     }

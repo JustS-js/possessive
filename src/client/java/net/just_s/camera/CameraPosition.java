@@ -24,6 +24,13 @@ public class CameraPosition {
         setRotation(entity.getYRot(), entity.getXRot());
     }
 
+    public CameraPosition(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        setRotation(0, 0);
+    }
+
     // From net.minecraft.client.render.Camera.setRotation
     public void setRotation(float yaw, float pitch) {
         this.pitch = pitch;
