@@ -7,6 +7,7 @@
   "key.possessive.save_pose": "Сохранить позу Стойки",
   "possessive.message.load_pose": "Поза восстановлена.",
   "possessive.message.save_pose": "Поза сохранена.",
+  "possessive.message.vessel_broken": "Сосуд разрушен.",
   "possessive.message.vessel_empty": "Вы фрагментированы.",
   "possessive.message.vessel_fail": "Сосуд отвергает Вас.",
   "possessive.message.vessel_success": "Сосуд принимает Вас."

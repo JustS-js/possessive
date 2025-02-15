@@ -6,6 +6,7 @@
   "possessive.message.vessel_fail": "The Vessel rejects You.",
   "possessive.message.vessel_success": "The Vessel accepts You.",
   "possessive.message.vessel_empty": "You are fragmented.",
+  "possessive.message.vessel_broken": "The Vessel is broken.",
   "possessive.message.save_pose": "Pose Saved.",
   "possessive.message.load_pose": "Pose Restored.",
   "armorposer.gui.label.animate_button": "Animate Movement",

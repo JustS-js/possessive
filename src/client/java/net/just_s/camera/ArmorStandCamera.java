@@ -20,8 +20,11 @@ import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -94,6 +97,32 @@ public class ArmorStandCamera extends AbstractCamera {
 
     public ArmorStand getPossessed() {
         return possessedArmorStand;
+    }
+
+    @Override
+    public void tick() {
+        if (!possessedArmorStand.isAlive()) {
+            PossessiveModClient.cameraHandler.enableCamera(
+                    new AstralProjectionCamera(minecraft, this)
+            );
+            AbstractCamera camera = PossessiveModClient.cameraHandler.getCamera();
+            for(int i = 0; i < 20; ++i) {
+                double d = camera.getRandom().nextGaussian() * 0.02;
+                double e = camera.getRandom().nextGaussian() * 0.02;
+                double f = camera.getRandom().nextGaussian() * 0.02;
+                camera.level().addParticle(
+                        ParticleTypes.POOF,
+                        camera.getRandomX(1.0) - d * 10.0,
+                        camera.getRandomY() - e * 10.0,
+                        camera.getRandomZ(1.0) - f * 10.0,
+                        d, e, f
+                );
+            }
+            camera.playSound(SoundEvents.APPLY_EFFECT_RAID_OMEN, 1f, 1f);
+            Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.vessel_broken"), false);
+            return;
+        }
+        super.tick();
     }
 
     @Override
