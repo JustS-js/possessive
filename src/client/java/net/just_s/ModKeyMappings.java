@@ -7,7 +7,6 @@ import net.just_s.camera.ArmorStandCamera;
 import net.just_s.camera.AstralProjectionCamera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.DustParticle;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.*;
 import net.minecraft.nbt.CompoundTag;
@@ -18,8 +17,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.UUID;
 
 public class ModKeyMappings {
     private static KeyMapping possessKeyMapping;

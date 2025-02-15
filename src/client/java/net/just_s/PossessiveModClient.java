@@ -20,6 +20,7 @@ public class PossessiveModClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModKeyMappings.registerModKeyMappings();
 		ClientTickEvents.START_CLIENT_TICK.register(PossessiveModClient::preTick);
+		LOGGER.info("possessive addon loaded.");
 	}
 
 	private static void preTick(Minecraft client) {

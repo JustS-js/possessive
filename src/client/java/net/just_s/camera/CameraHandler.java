@@ -1,6 +1,5 @@
 package net.just_s.camera;
 
-import net.just_s.PossessiveModClient;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.ClientInput;
