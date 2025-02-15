@@ -8,15 +8,12 @@ import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.ArmorStandArmorModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
@@ -30,12 +27,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
 
+    private CompoundTag savedPose;
     private boolean animateMoving = false;
     private static float animationSpeed = 0.3f;
     private static float animationMultiplier = 3;
@@ -56,6 +54,11 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setAbilityToChangePerspective(true);
         this.setRenderHand(true);
         this.setRenderBlockOutline(true);
+
+        CompoundTag compoundTag = this.getPossessed().saveWithoutId(new CompoundTag());
+        if (compoundTag.contains("Pose")) {
+            this.savePose(compoundTag.getCompound("Pose"));
+        }
     }
 
     @Override
@@ -253,6 +256,18 @@ public class ArmorStandCamera extends AbstractCamera {
         armorStandModel.rightArm.zRot = 0.1F;
 
         armorStandArm.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(ArmorStandRenderer.DEFAULT_SKIN_LOCATION)), i, OverlayTexture.NO_OVERLAY);
+    }
+
+    public void applySavedPose() {
+        if (this.savedPose != null) {
+            CompoundTag compoundTag = possessedArmorStand.saveWithoutId(new CompoundTag());
+            compoundTag.put("Pose", this.savedPose);
+            this.sendCompound(compoundTag);
+        }
+    }
+
+    public void savePose(@Nullable CompoundTag pose) {
+        this.savedPose = pose;
     }
 
     @Override

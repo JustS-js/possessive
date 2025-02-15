@@ -23,6 +23,8 @@ import java.util.UUID;
 
 public class ModKeyMappings {
     private static KeyMapping possessKeyMapping;
+    private static KeyMapping savePoseKeyMapping;
+    private static KeyMapping loadPoseKeyMapping;
 
     public static void registerModKeyMappings() {
         possessKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
@@ -32,6 +34,22 @@ public class ModKeyMappings {
                 "category.possessive" // The translation key of the keybinding's category.
         ));
         ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::possessKeyPress);
+
+        savePoseKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.possessive.save_pose",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_LEFT_BRACKET,
+                "category.possessive"
+        ));
+        ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::savePoseKeyPress);
+
+        loadPoseKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.possessive.load_pose",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_RIGHT_BRACKET,
+                "category.possessive"
+        ));
+        ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::loadPoseKeyPress);
     }
 
     private static void possessKeyPress(Minecraft client) {
@@ -127,5 +145,48 @@ public class ModKeyMappings {
         }
         camera.playSound(soundEvent, volume, pitch);
         Minecraft.getInstance().gui.setOverlayMessage(Component.translatable(translatable), false);
+    }
+
+    private static void savePoseKeyPress(Minecraft client) {
+        if (client.player == null) {
+            return;
+        }
+
+        if (!PossessiveModClient.cameraHandler.isEnabled()) {
+            return;
+        }
+
+        if (!(PossessiveModClient.cameraHandler.getCamera() instanceof ArmorStandCamera camera)) {
+            return;
+        }
+
+        while (savePoseKeyMapping.consumeClick()) {
+            CompoundTag compoundTag = camera.getPossessed().saveWithoutId(new CompoundTag());
+            if (compoundTag.contains("Pose")) {
+                camera.savePose(compoundTag.getCompound("Pose"));
+                Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.save_pose"), false);
+                camera.playSound(SoundEvents.ARMOR_STAND_PLACE, 0.5f, 1.2f);
+            }
+        }
+    }
+
+    private static void loadPoseKeyPress(Minecraft client) {
+        if (client.player == null) {
+            return;
+        }
+
+        if (!PossessiveModClient.cameraHandler.isEnabled()) {
+            return;
+        }
+
+        if (!(PossessiveModClient.cameraHandler.getCamera() instanceof ArmorStandCamera camera)) {
+            return;
+        }
+
+        while (loadPoseKeyMapping.consumeClick()) {
+            camera.applySavedPose();
+            Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.load_pose"), false);
+            camera.playSound(SoundEvents.ARMOR_STAND_HIT, 0.5f, 1.2f);
+        }
     }
 }

@@ -1,9 +1,13 @@
 {
   "key.possessive.possess": "Possess",
+  "key.possessive.save_pose": "Save ArmorStand's Pose",
+  "key.possessive.load_pose": "Restore ArmorStand's Pose",
   "category.possessive": "Possessive",
   "possessive.message.vessel_fail": "The Vessel rejects You.",
   "possessive.message.vessel_success": "The Vessel accepts You.",
   "possessive.message.vessel_empty": "You are fragmented.",
+  "possessive.message.save_pose": "Pose Saved.",
+  "possessive.message.load_pose": "Pose Restored.",
   "armorposer.gui.label.animate_button": "Animate Movement",
   "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand"
 }
