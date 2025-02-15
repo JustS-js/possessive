@@ -8,10 +8,14 @@ import net.just_s.camera.AstralProjectionCamera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.UUID;
 
 public class ModKeyMappings {
     private static KeyMapping possessKeyMapping;
@@ -48,25 +52,44 @@ public class ModKeyMappings {
             }
 
             Entity entity = PossessiveModClient.cameraHandler.getCamera().getCrosshairEntity(
-                    (e) -> (e instanceof LocalPlayer && e.equals(Minecraft.getInstance().player)) || (e instanceof ArmorStand), 3
+                    (e) -> (e instanceof LivingEntity), 3
             );
             if (entity == null) {
                 return;
             }
 
-            PossessiveModClient.cameraHandler.disableCamera();
             switch (entity) {
                 case LocalPlayer player -> {
+                    if (!player.getUUID().equals(client.player.getUUID())) {
+                        playBadAttemptToPossess(client, player);
+                        return;
+                    }
+                    PossessiveModClient.cameraHandler.disableCamera();
                     client.player.displayClientMessage(Component.literal("returned in body!"), false);
                 }
                 case ArmorStand armorStand -> {
+                    CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
+                    if (armorStandTag.contains("PossessedBy")) {
+                        CompoundTag possessedTag = armorStandTag.getCompound("PossessedBy");
+                        UUID owner = possessedTag.getUUID("PossessedBy");
+                        if (owner != null && !owner.equals(client.player.getUUID())) {
+                            playBadAttemptToPossess(client, armorStand);
+                            return;
+                        }
+                    }
+
                     PossessiveModClient.cameraHandler.enableCamera(
                             new ArmorStandCamera(client, armorStand)
                     );
                     client.player.displayClientMessage(Component.literal("possessed!"), false);
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + entity);
+                default -> playBadAttemptToPossess(client, entity);
             }
         }
+    }
+
+    private static void playBadAttemptToPossess(Minecraft client, Entity entity) {
+        assert client.player != null;
+        client.player.displayClientMessage(Component.literal("possessed!"), false);
     }
 }

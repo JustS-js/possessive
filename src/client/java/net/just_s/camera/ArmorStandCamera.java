@@ -17,14 +17,13 @@ import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+
+import java.util.UUID;
 
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
@@ -97,7 +96,9 @@ public class ArmorStandCamera extends AbstractCamera {
 
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            this.sendCompound(this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ()));
+            CompoundTag compoundTag = this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ());
+            LOGGER.info(compoundTag.toString());
+            this.sendCompound(compoundTag);
         }
 
         return false;
@@ -147,7 +148,52 @@ public class ArmorStandCamera extends AbstractCamera {
         positionOffset.add(DoubleTag.valueOf(z));
         compoundTag.put("Pos", positionOffset);
 
+        this.putPossessionTag(compoundTag);
+
         return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
+    }
+
+    private void putPossessionTag(CompoundTag compoundTag) {
+        this.updatePossessionTag(compoundTag, false);
+    }
+
+    private void removePossessionTag(CompoundTag compoundTag) {
+        this.updatePossessionTag(compoundTag, true);
+    }
+
+    private void updatePossessionTag(CompoundTag compoundTag, boolean remove) {
+        String prefix = "PossessedBy-";
+        ListTag tagList;
+        LOGGER.info((compoundTag.contains("Tags")) + " | " + compoundTag.toString());
+        if (compoundTag.contains("Tags")) {
+            tagList = compoundTag.getList("Tags", 8);
+        } else {
+            tagList = new ListTag();
+        }
+        int i = Math.min(tagList.size(), 1024);
+        LOGGER.info("amount of tags: " + i);
+        for(int j = 0; j < i; ++j) {
+            String tag = tagList.getString(j);
+            LOGGER.info(tag);
+            if (tag.startsWith(prefix)) {
+                String stringUUID = (tag.length() > prefix.length() ) ? tag.substring(prefix.length()) : "";
+                LOGGER.info(stringUUID);
+                if (UUID.fromString(stringUUID).equals(Minecraft.getInstance().player.getUUID())) {
+                    LOGGER.info("found it!!");
+                    if (remove) {
+                        LOGGER.info("removing");
+                        tagList.remove(j);
+                        compoundTag.put("Tags", tagList);
+                        LOGGER.info(compoundTag.toString());
+                    }
+                    return;
+                }
+            }
+        }
+        if (!remove) {
+            tagList.add(StringTag.valueOf(prefix + Minecraft.getInstance().player.getUUID().toString()));
+            compoundTag.put("Tags", tagList);
+        }
     }
 
     public void tickAnimation() {
@@ -245,5 +291,16 @@ public class ArmorStandCamera extends AbstractCamera {
 
     public void setAnimateMoving(boolean animateMoving) {
         this.animateMoving = animateMoving;
+    }
+
+    @Override
+    public void despawn() {
+        super.despawn();
+
+        LOGGER.info("ewww");
+        CompoundTag compoundTag = this.possessedArmorStand.saveWithoutId(new CompoundTag());
+        this.removePossessionTag(compoundTag);
+        //compoundTag.remove("PossessedBy");
+        sendCompound(compoundTag);
     }
 }

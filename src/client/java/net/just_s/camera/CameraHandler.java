@@ -41,6 +41,7 @@ public class CameraHandler {
         //client.smartCull = true;
         client.gameRenderer.setRenderHand(true);
         client.setCameraEntity(client.player);
+        PossessiveModClient.LOGGER.info("camera != null? " + (camera != null));
         if (camera != null) {
             camera.despawn();
             camera.input = new ClientInput();
