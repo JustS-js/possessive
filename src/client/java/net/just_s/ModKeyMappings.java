@@ -7,9 +7,13 @@ import net.just_s.camera.ArmorStandCamera;
 import net.just_s.camera.AstralProjectionCamera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.DustParticle;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -44,7 +48,12 @@ public class ModKeyMappings {
                 PossessiveModClient.cameraHandler.enableCamera(
                         new AstralProjectionCamera(client, client.cameraEntity)
                 );
-                client.player.displayClientMessage(Component.literal("astral projected!"), false);
+                playFeedback(
+                        PossessiveModClient.cameraHandler.getCamera(),
+                        ParticleTypes.POOF,
+                        SoundEvents.APPLY_EFFECT_TRIAL_OMEN, 1f, 1f,
+                        "possessive.message.vessel_empty"
+                );
                 return;
             }
             if (!isAstral) {
@@ -61,35 +70,62 @@ public class ModKeyMappings {
             switch (entity) {
                 case LocalPlayer player -> {
                     if (!player.getUUID().equals(client.player.getUUID())) {
-                        playBadAttemptToPossess(client, player);
+                        playBadAttemptToPossess(player);
                         return;
                     }
                     PossessiveModClient.cameraHandler.disableCamera();
-                    client.player.displayClientMessage(Component.literal("returned in body!"), false);
+                    playGoodAttemptToPossess(player);
                 }
                 case ArmorStand armorStand -> {
                     CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
-                    if (armorStandTag.contains("PossessedBy")) {
-                        CompoundTag possessedTag = armorStandTag.getCompound("PossessedBy");
-                        UUID owner = possessedTag.getUUID("PossessedBy");
-                        if (owner != null && !owner.equals(client.player.getUUID())) {
-                            playBadAttemptToPossess(client, armorStand);
-                            return;
-                        }
+                    if (armorStandTag.getBoolean("Silent")) {
+                        playBadAttemptToPossess(armorStand);
+                        return;
                     }
 
                     PossessiveModClient.cameraHandler.enableCamera(
                             new ArmorStandCamera(client, armorStand)
                     );
-                    client.player.displayClientMessage(Component.literal("possessed!"), false);
+                    playGoodAttemptToPossess(armorStand);
                 }
-                default -> playBadAttemptToPossess(client, entity);
+                default -> playBadAttemptToPossess(entity);
             }
         }
     }
 
-    private static void playBadAttemptToPossess(Minecraft client, Entity entity) {
-        assert client.player != null;
-        client.player.displayClientMessage(Component.literal("possessed!"), false);
+    private static void playGoodAttemptToPossess(Entity entity) {
+        playFeedback(
+                entity,
+                ParticleTypes.POOF,
+                SoundEvents.APPLY_EFFECT_TRIAL_OMEN, 1f, 1f,
+                "possessive.message.vessel_success"
+        );
+    }
+
+    private static void playBadAttemptToPossess(Entity entity) {
+        playFeedback(
+                entity,
+                DustParticleOptions.REDSTONE,
+                SoundEvents.PLAYER_BREATH, 0.5f, 0.5f,
+                "possessive.message.vessel_fail"
+        );
+    }
+
+    private static void playFeedback(Entity entity, ParticleOptions particleOptions, SoundEvent soundEvent, float volume, float pitch, String translatable) {
+        Entity camera = Minecraft.getInstance().cameraEntity;
+        for(int i = 0; i < 20; ++i) {
+            double d = camera.getRandom().nextGaussian() * 0.02;
+            double e = camera.getRandom().nextGaussian() * 0.02;
+            double f = camera.getRandom().nextGaussian() * 0.02;
+            camera.level().addParticle(
+                    particleOptions,
+                    entity.getRandomX(1.0) - d * 10.0,
+                    entity.getRandomY() - e * 10.0,
+                    entity.getRandomZ(1.0) - f * 10.0,
+                    d, e, f
+            );
+        }
+        camera.playSound(soundEvent, volume, pitch);
+        Minecraft.getInstance().gui.setOverlayMessage(Component.translatable(translatable), false);
     }
 }

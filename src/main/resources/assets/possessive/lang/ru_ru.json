@@ -1,6 +1,9 @@
 {
   "key.possessive.possess": "Вселиться",
   "category.possessive": "Possessive",
+  "possessive.message.vessel_fail": "Сосуд отвергает Вас.",
+  "possessive.message.vessel_success": "Сосуд принимает Вас.",
+  "possessive.message.vessel_empty": "Вы фрагментированы.",
   "armorposer.gui.label.animate_button": "Анимировать движение",
   "armorposer.gui.tooltip.animate_button": "Анимировать руки и ноги при движении одержимой стойки для брони"
 }

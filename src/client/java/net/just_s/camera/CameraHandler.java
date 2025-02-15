@@ -24,7 +24,6 @@ public class CameraHandler {
         this.camera = newCamera;
 
         Minecraft client = Minecraft.getInstance();
-        //client.smartCull = false;
         client.gameRenderer.setRenderHand(newCamera.shouldRenderHand());
 
         if (client.gameRenderer.getMainCamera().isDetached()) {
@@ -36,12 +35,9 @@ public class CameraHandler {
     }
 
     public void disableCamera() {
-        PossessiveModClient.LOGGER.info("disable");
         Minecraft client = Minecraft.getInstance();
-        //client.smartCull = true;
         client.gameRenderer.setRenderHand(true);
         client.setCameraEntity(client.player);
-        PossessiveModClient.LOGGER.info("camera != null? " + (camera != null));
         if (camera != null) {
             camera.despawn();
             camera.input = new ClientInput();

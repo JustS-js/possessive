@@ -23,8 +23,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
-import java.util.UUID;
-
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
 
@@ -97,7 +95,6 @@ public class ArmorStandCamera extends AbstractCamera {
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
             CompoundTag compoundTag = this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ());
-            LOGGER.info(compoundTag.toString());
             this.sendCompound(compoundTag);
         }
 
@@ -162,38 +159,7 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     private void updatePossessionTag(CompoundTag compoundTag, boolean remove) {
-        String prefix = "PossessedBy-";
-        ListTag tagList;
-        LOGGER.info((compoundTag.contains("Tags")) + " | " + compoundTag.toString());
-        if (compoundTag.contains("Tags")) {
-            tagList = compoundTag.getList("Tags", 8);
-        } else {
-            tagList = new ListTag();
-        }
-        int i = Math.min(tagList.size(), 1024);
-        LOGGER.info("amount of tags: " + i);
-        for(int j = 0; j < i; ++j) {
-            String tag = tagList.getString(j);
-            LOGGER.info(tag);
-            if (tag.startsWith(prefix)) {
-                String stringUUID = (tag.length() > prefix.length() ) ? tag.substring(prefix.length()) : "";
-                LOGGER.info(stringUUID);
-                if (UUID.fromString(stringUUID).equals(Minecraft.getInstance().player.getUUID())) {
-                    LOGGER.info("found it!!");
-                    if (remove) {
-                        LOGGER.info("removing");
-                        tagList.remove(j);
-                        compoundTag.put("Tags", tagList);
-                        LOGGER.info(compoundTag.toString());
-                    }
-                    return;
-                }
-            }
-        }
-        if (!remove) {
-            tagList.add(StringTag.valueOf(prefix + Minecraft.getInstance().player.getUUID().toString()));
-            compoundTag.put("Tags", tagList);
-        }
+        compoundTag.putBoolean("Silent", !remove);
     }
 
     public void tickAnimation() {
@@ -297,10 +263,8 @@ public class ArmorStandCamera extends AbstractCamera {
     public void despawn() {
         super.despawn();
 
-        LOGGER.info("ewww");
         CompoundTag compoundTag = this.possessedArmorStand.saveWithoutId(new CompoundTag());
         this.removePossessionTag(compoundTag);
-        //compoundTag.remove("PossessedBy");
         sendCompound(compoundTag);
     }
 }
