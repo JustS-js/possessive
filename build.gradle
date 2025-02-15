@@ -27,6 +27,8 @@ loom {
 		}
 	}
 
+	accessWidenerPath = file("src/main/resources/possessive.accesswidener")
+
 }
 
 dependencies {

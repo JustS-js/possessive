@@ -31,5 +31,6 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"armorposer": ">=8.0.1"
-	}
+	},
+	"accessWidener" : "possessive.accesswidener"
 }

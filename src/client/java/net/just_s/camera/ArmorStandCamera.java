@@ -4,13 +4,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.armorposer.data.SyncData;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.ArmorStandArmorModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
@@ -20,8 +26,12 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class ArmorStandCamera extends AbstractCamera {
     private final ArmorStand possessedArmorStand;
@@ -33,6 +43,8 @@ public class ArmorStandCamera extends AbstractCamera {
     private float animationAngle = 0f;
     private float animationIntensity = 0;
     private float animationState = 0;
+
+    private static final ResourceLocation ITEM_SLOT_SPRITE = ResourceLocation.fromNamespaceAndPath(PossessiveModClient.MOD_ID, "hud/item_slot");
 
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
         super(client, -120);
@@ -266,5 +278,79 @@ public class ArmorStandCamera extends AbstractCamera {
         CompoundTag compoundTag = this.possessedArmorStand.saveWithoutId(new CompoundTag());
         this.removePossessionTag(compoundTag);
         sendCompound(compoundTag);
+    }
+
+    @Override
+    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        renderArmorStandItemHotbar(guiGraphics, deltaTracker);
+        return true;
+    }
+
+    private void renderArmorStandItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        if (minecraft.player == null) {
+            return;
+        }
+        ItemStack leftHandItemStack = possessedArmorStand.getOffhandItem();
+        ItemStack rightHandItemStack = possessedArmorStand.getMainHandItem();
+
+        int x_mid = guiGraphics.guiWidth() / 2;
+        guiGraphics.pose().pushPose();
+
+        guiGraphics.pose().translate(0.0F, 0.0F, -90.0F);
+        guiGraphics.blitSprite(RenderType::guiTextured, ITEM_SLOT_SPRITE, x_mid - 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
+        guiGraphics.blitSprite(RenderType::guiTextured, ITEM_SLOT_SPRITE, x_mid + 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
+
+        guiGraphics.pose().popPose();
+
+        int y = guiGraphics.guiHeight() - 16 - 3;
+        if (!leftHandItemStack.isEmpty()) {
+            this.renderSlot(guiGraphics, x_mid - 46 - 8, y, deltaTracker, leftHandItemStack, 0);
+        }
+        if (!rightHandItemStack.isEmpty()) {
+            this.renderSlot(guiGraphics, x_mid + 46 - 8, y, deltaTracker, rightHandItemStack, 0);
+        }
+    }
+
+    private void renderSlot(GuiGraphics guiGraphics, int i, int j, DeltaTracker deltaTracker, ItemStack itemStack, int k) {
+        if (!itemStack.isEmpty()) {
+            float f = (float)itemStack.getPopTime() - deltaTracker.getGameTimeDeltaPartialTick(false);
+            if (f > 0.0F) {
+                float g = 1.0F + f / 5.0F;
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate((float)(i + 8), (float)(j + 12), 0.0F);
+                guiGraphics.pose().scale(1.0F / g, (g + 1.0F) / 2.0F, 1.0F);
+                guiGraphics.pose().translate((float)(-(i + 8)), (float)(-(j + 12)), 0.0F);
+            }
+
+            guiGraphics.renderFakeItem(itemStack, i, j, k);
+            if (f > 0.0F) {
+                guiGraphics.pose().popPose();
+            }
+
+            guiGraphics.renderItemDecorations(this.minecraft.font, itemStack, i, j);
+        }
+    }
+
+    @Override
+    public boolean shouldRenderItemInMainHand(boolean original) {
+        return original;
+    }
+
+    @Override
+    public boolean shouldRenderItemInOffHand(boolean original) {
+        if (minecraft.options.mainHand().get().equals(HumanoidArm.RIGHT)) {
+            return !possessedArmorStand.getOffhandItem().isEmpty();
+        }
+        return !possessedArmorStand.getMainHandItem().isEmpty();
+    }
+
+    @Override
+    public ItemStack getItemToRender(InteractionHand hand) {
+        boolean bl = minecraft.options.mainHand().get().equals(HumanoidArm.RIGHT);
+        if (hand.equals(InteractionHand.MAIN_HAND)) {
+            return bl ? possessedArmorStand.getMainHandItem() : possessedArmorStand.getOffhandItem();
+        } else {
+            return bl ? possessedArmorStand.getOffhandItem() : possessedArmorStand.getMainHandItem();
+        }
     }
 }

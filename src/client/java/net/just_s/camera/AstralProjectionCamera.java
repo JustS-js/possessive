@@ -2,8 +2,10 @@ package net.just_s.camera;
 
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import net.just_s.PossessiveModClient;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.LevelTargetBundle;
@@ -156,5 +158,10 @@ public class AstralProjectionCamera extends AbstractCamera {
             return;
         }
         astralShader.addToFrame(frameGraphBuilder, width, height, targetBundle);
+    }
+
+    @Override
+    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        return true;
     }
 }

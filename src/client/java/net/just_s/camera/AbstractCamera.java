@@ -15,6 +15,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -221,5 +223,21 @@ public abstract class AbstractCamera extends LocalPlayer {
 
     public boolean shouldRenderEntity(Entity entity) {
         return true;
+    }
+
+    public boolean  onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        return false;
+    }
+
+    public boolean shouldRenderItemInMainHand(boolean original) {
+        return original;
+    }
+
+    public boolean shouldRenderItemInOffHand(boolean original) {
+        return original;
+    }
+
+    public ItemStack getItemToRender(InteractionHand hand) {
+        return ItemStack.EMPTY;
     }
 }

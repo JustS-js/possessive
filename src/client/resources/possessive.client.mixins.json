@@ -6,6 +6,8 @@
     "ClientPacketListenerMixin",
     "EntityMixin",
     "GameRendererMixin",
+    "GuiMixin",
+    "ItemInHandRendererMixin",
     "LevelRendererMixin",
     "LocalPlayerAccessor",
     "LocalPlayerMixin",
