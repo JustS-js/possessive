@@ -235,4 +235,8 @@ public abstract class AbstractCamera extends LocalPlayer {
     public ItemStack getItemToRender(InteractionHand hand) {
         return ItemStack.EMPTY;
     }
+
+    public boolean isExperienceBarVisible() {
+        return false;
+    }
 }
