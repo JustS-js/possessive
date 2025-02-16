@@ -18,7 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.lwjgl.glfw.GLFW;
 
-public class ModKeyMappings {
+public class PossessiveKeyMappings {
     private static KeyMapping possessKeyMapping;
     private static KeyMapping savePoseKeyMapping;
     private static KeyMapping loadPoseKeyMapping;
@@ -30,7 +30,7 @@ public class ModKeyMappings {
                 GLFW.GLFW_KEY_R, // The keycode of the key
                 "category.possessive" // The translation key of the keybinding's category.
         ));
-        ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::possessKeyPress);
+        ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::possessKeyPress);
 
         savePoseKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.possessive.save_pose",
@@ -38,7 +38,7 @@ public class ModKeyMappings {
                 GLFW.GLFW_KEY_LEFT_BRACKET,
                 "category.possessive"
         ));
-        ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::savePoseKeyPress);
+        ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::savePoseKeyPress);
 
         loadPoseKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.possessive.load_pose",
@@ -46,7 +46,7 @@ public class ModKeyMappings {
                 GLFW.GLFW_KEY_RIGHT_BRACKET,
                 "category.possessive"
         ));
-        ClientTickEvents.END_CLIENT_TICK.register(ModKeyMappings::loadPoseKeyPress);
+        ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::loadPoseKeyPress);
     }
 
     private static void possessKeyPress(Minecraft client) {
