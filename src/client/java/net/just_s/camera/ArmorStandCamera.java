@@ -126,9 +126,12 @@ public class ArmorStandCamera extends AbstractCamera {
         }
 
         //LOGGER.info(this.getScale() + " | " + this.possessedArmorStand.getScale() + " | " + this.possessedArmorStand.getAgeScale());
-        if (this.getScale() != this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale()) {
+        float asScale = this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale();
+        if (this.getScale() != asScale) {
             AttributeMap attributeMap = this.getAttributes();
-            attributeMap.getInstance(Attributes.SCALE).setBaseValue(this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale());
+            attributeMap.getInstance(Attributes.SCALE).setBaseValue(asScale);
+            attributeMap.getInstance(Attributes.STEP_HEIGHT).setBaseValue(asScale * 0.6f);
+            attributeMap.getInstance(Attributes.JUMP_STRENGTH).setBaseValue(0.41f + 0.1f * asScale);
         }
         super.tick();
     }
@@ -215,7 +218,9 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     public void tickAnimation() {
-        animationAngle = (float) ((animationAngle + animationSpeed) % (2 * Math.PI));
+        float size = this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale();
+        float appliedSpeed = animationSpeed * 1 / size;
+        animationAngle = (float) ((animationAngle + appliedSpeed) % (2 * Math.PI));
         animationIntensity = Math.clamp((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 0f, 1f);
         animationState = (float) Math.sin(animationAngle) * animationMaxAngle * animationIntensity;
         if (Float.compare(0f, animationIntensity) == 1) {
