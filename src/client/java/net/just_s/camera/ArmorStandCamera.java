@@ -29,6 +29,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +103,7 @@ public class ArmorStandCamera extends AbstractCamera {
 
     @Override
     public void tick() {
-        if (!possessedArmorStand.isAlive()) {
+        if (this.possessedArmorStand == null || !possessedArmorStand.isAlive()) {
             PossessiveModClient.cameraHandler.enableCamera(
                     new AstralProjectionCamera(minecraft, this)
             );
@@ -121,6 +123,12 @@ public class ArmorStandCamera extends AbstractCamera {
             camera.playSound(SoundEvents.APPLY_EFFECT_RAID_OMEN, 1f, 1f);
             Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.vessel_broken"), false);
             return;
+        }
+
+        //LOGGER.info(this.getScale() + " | " + this.possessedArmorStand.getScale() + " | " + this.possessedArmorStand.getAgeScale());
+        if (this.getScale() != this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale()) {
+            AttributeMap attributeMap = this.getAttributes();
+            attributeMap.getInstance(Attributes.SCALE).setBaseValue(this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale());
         }
         super.tick();
     }
