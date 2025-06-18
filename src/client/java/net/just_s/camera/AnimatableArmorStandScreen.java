@@ -28,6 +28,7 @@ public class AnimatableArmorStandScreen extends ArmorStandScreen {
             camera.setAnimateMoving(toggleButton.getValue());
             this.textFieldUpdated();
         }).bounds(this.width - 20 - 100, 174, 100, 18).build());
+        animateButton.setTooltip(Tooltip.create(Component.translatable("armorposer.gui.tooltip.animate_button")));
         this.addRenderableWidget(syncButton = new Button.Builder(Component.translatable("armorposer.gui.label.sync_button"),  (button) -> {
             camera.syncArmorStandPos();
         }).bounds(this.width - 20 - 100, 195, 100, 18).build());
