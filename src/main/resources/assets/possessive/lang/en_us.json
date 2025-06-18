@@ -10,5 +10,7 @@
   "possessive.message.save_pose": "Pose Saved.",
   "possessive.message.load_pose": "Pose Restored.",
   "armorposer.gui.label.animate_button": "Animate Movement",
-  "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand"
+  "armorposer.gui.label.sync_button": "Sync",
+  "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand",
+  "armorposer.gui.tooltip.sync_button": "Synchronize Armor Stand's position with your camera"
 }
