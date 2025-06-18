@@ -47,6 +47,8 @@ public class ArmorStandCamera extends AbstractCamera {
     private float animationIntensity = 0;
     private float animationState = 0;
 
+    private boolean shouldSkipNextPacket;
+
     private static final ResourceLocation ITEM_SLOT_SPRITE = ResourceLocation.fromNamespaceAndPath(PossessiveModClient.MOD_ID, "hud/item_slot");
 
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
@@ -62,7 +64,7 @@ public class ArmorStandCamera extends AbstractCamera {
 
         CompoundTag compoundTag = this.getPossessed().saveWithoutId(new CompoundTag());
         if (compoundTag.contains("Pose")) {
-            this.savePose(compoundTag.getCompound("Pose"));
+            this.savePose(compoundTag.getCompoundOrEmpty("Pose"));
         }
     }
 
@@ -79,15 +81,15 @@ public class ArmorStandCamera extends AbstractCamera {
 
         CompoundTag compoundTag = armorStand.saveWithoutId(new CompoundTag());
         if (compoundTag.contains("Rotation")) {
-            ListTag rotationTag = compoundTag.getList("Rotation", 5);
-            preBodyYRot = rotationTag.getFloat(0);
+            ListTag rotationTag = compoundTag.getListOrEmpty("Rotation");
+            preBodyYRot = rotationTag.getFloatOr(0, 0f);
         }
         if (compoundTag.contains("Pose")) {
-            CompoundTag poseTag = compoundTag.getCompound("Pose");
+            CompoundTag poseTag = compoundTag.getCompoundOrEmpty("Pose");
             if (poseTag.contains("Head")) {
-                ListTag headTag = poseTag.getList("Head", 5);
-                preHeadYRot = headTag.getFloat(0);
-                preHeadXRot = headTag.getFloat(1) + preBodyYRot;
+                ListTag headTag = poseTag.getListOrEmpty("Head");
+                preHeadYRot = headTag.getFloatOr(0, 0f);
+                preHeadXRot = headTag.getFloatOr(1, 0f) + preBodyYRot;
             }
         }
 
@@ -133,11 +135,20 @@ public class ArmorStandCamera extends AbstractCamera {
             attributeMap.getInstance(Attributes.STEP_HEIGHT).setBaseValue(asScale * 0.6f);
             attributeMap.getInstance(Attributes.JUMP_STRENGTH).setBaseValue(0.41f + 0.1f * asScale);
         }
+        this.onSendPosition();
         super.tick();
+
     }
 
     @Override
     public boolean onSendPosition() {
+        // for some strange reason LocalPlayer.sendPosition() fires twice per client tick?
+        // i don't want to spend entire evening on debugging why D:
+        this.shouldSkipNextPacket = !shouldSkipNextPacket;
+        if (this.shouldSkipNextPacket) {
+            return false;
+        }
+
         // check for player movement
         double dX = this.getX() - ((LocalPlayerAccessor)this).getXLast();
         double dY = this.getY() - ((LocalPlayerAccessor)this).getYLast();
@@ -150,11 +161,13 @@ public class ArmorStandCamera extends AbstractCamera {
 
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            CompoundTag compoundTag = this.generateCompoundFromCamera(
-                    this.getX() - possessedArmorStand.getX(),
-                    this.getY() - possessedArmorStand.getY(),
-                    this.getZ() - possessedArmorStand.getZ()
-            );
+            double dx = this.getX() - possessedArmorStand.getX();
+            double dy = this.getY() - possessedArmorStand.getY();
+            double dz = this.getZ() - possessedArmorStand.getZ();
+            CompoundTag compoundTag = this.generateCompoundFromCamera(dx, dy, dz);
+            LOGGER.warn("dX: " + this.getX() + " - " + possessedArmorStand.getX() + " = " + dx);
+            LOGGER.warn("dY: " + this.getY() + " - " + possessedArmorStand.getY() + " = " + dy);
+            LOGGER.warn("dZ: " + this.getZ() + " - " + possessedArmorStand.getZ() + " = " + dz);
             this.sendCompound(compoundTag);
         }
 
@@ -179,11 +192,11 @@ public class ArmorStandCamera extends AbstractCamera {
         poseHeadTag.add(FloatTag.valueOf(this.yHeadRot - this.yBodyRot));
         float headTilt = 0;
         if (original.contains("Pose")) {
-            CompoundTag originalPoseTag = original.getCompound("Pose");
+            CompoundTag originalPoseTag = original.getCompoundOrEmpty("Pose");
             if (originalPoseTag.contains("Head")) {
-                ListTag originalHeadTag = originalPoseTag.getList("Head", 5);
+                ListTag originalHeadTag = originalPoseTag.getListOrEmpty("Head");
                 if (originalHeadTag.size() > 2) {
-                    headTilt = originalHeadTag.getFloat(2);
+                    headTilt = originalHeadTag.getFloatOr(2, 0f);
                 }
             }
         }
@@ -219,7 +232,11 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     private void updatePossessionTag(CompoundTag compoundTag, boolean remove) {
-        compoundTag.putBoolean("Silent", !remove);
+        int disabledSlotsAsFlag = compoundTag.getIntOr("DisabledSlots", 0);
+        compoundTag.putInt(
+                "DisabledSlots",
+                PossessiveModClient.setOccupiedFlag(disabledSlotsAsFlag, !remove)
+        );
     }
 
     public void tickAnimation() {

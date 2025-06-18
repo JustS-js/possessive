@@ -2,6 +2,7 @@ package net.just_s.camera;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -36,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 // heavily (absolutely) inspired by (stripped from) freecam https://github.com/MinecraftFreecam/Freecam
@@ -104,7 +106,7 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     public void applyPosition(CameraPosition position) {
-        moveTo(position.x, position.y, position.z, position.yaw, position.pitch);
+        snapTo(position.x, position.y, position.z, position.yaw, position.pitch);
         xBob = getXRot();
         yBob = getYRot();
         xBobO = xBob;
@@ -176,8 +178,8 @@ public abstract class AbstractCamera extends LocalPlayer {
      * for your shader.
      * For examples see assets/post_shader/astral.json
      */
-    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
-        // noop
+    public void onCameraShader(PostChain instance, FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle, Consumer<RenderPass> consumer) {
+        instance.addToFrame(frameGraphBuilder, width, height, targetBundle, consumer);
     }
 
     // copied from PlayerRenderer.renderHand()

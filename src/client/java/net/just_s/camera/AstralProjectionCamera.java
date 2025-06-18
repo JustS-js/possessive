@@ -1,6 +1,7 @@
 package net.just_s.camera;
 
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
+import com.mojang.blaze3d.systems.RenderPass;
 import net.just_s.PossessiveModClient;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GraphicsStatus;
@@ -17,6 +18,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Consumer;
 
 public class AstralProjectionCamera extends AbstractCamera {
     private GraphicsStatus storedGraphicStatus;
@@ -147,7 +150,7 @@ public class AstralProjectionCamera extends AbstractCamera {
     }
 
     @Override
-    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
+    public void onCameraShader(PostChain instance, FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle, Consumer<RenderPass> consumer) {
         PostChain astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
                 ResourceLocation.fromNamespaceAndPath(
                         PossessiveModClient.MOD_ID, "astral"
@@ -157,7 +160,7 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (astralShader == null) {
             return;
         }
-        astralShader.addToFrame(frameGraphBuilder, width, height, targetBundle);
+        astralShader.addToFrame(frameGraphBuilder, width, height, targetBundle, consumer);
     }
 
     @Override

@@ -93,7 +93,8 @@ public class PossessiveKeyMappings {
                 }
                 case ArmorStand armorStand -> {
                     CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
-                    if (armorStandTag.getBoolean("Silent")) {
+                    int disabledSlotsAsFlag = armorStandTag.getIntOr("DisabledSlots", 0);
+                    if (PossessiveModClient.isOccupiedFlag(disabledSlotsAsFlag)) {
                         playBadAttemptToPossess(armorStand);
                         return;
                     }
@@ -160,7 +161,7 @@ public class PossessiveKeyMappings {
         while (savePoseKeyMapping.consumeClick()) {
             CompoundTag compoundTag = camera.getPossessed().saveWithoutId(new CompoundTag());
             if (compoundTag.contains("Pose")) {
-                camera.savePose(compoundTag.getCompound("Pose"));
+                camera.savePose(compoundTag.getCompoundOrEmpty("Pose"));
                 Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.save_pose"), false);
                 camera.playSound(SoundEvents.ARMOR_STAND_PLACE, 0.5f, 1.2f);
             }

@@ -5,7 +5,8 @@
   },
   "passes": [
     {
-      "program": "minecraft:post/transparency",
+      "vertex_shader": "minecraft:post/screenquad",
+      "fragment_shader": "minecraft:post/transparency",
       "inputs": [
         {
           "sampler_name": "Main",
@@ -65,7 +66,8 @@
       "output": "swap"
     },
     {
-      "program": "possessive:post/limbo",
+      "vertex_shader": "minecraft:post/blit",
+      "fragment_shader": "possessive:post/limbo",
       "inputs": [
         {
           "sampler_name": "Main",
@@ -127,11 +129,19 @@
       ]
     },
     {
-      "program": "minecraft:post/blit",
+      "vertex_shader": "minecraft:post/blit",
+      "fragment_shader": "minecraft:post/blit",
       "inputs": [
         {
           "sampler_name": "In",
           "target": "final"
+        }
+      ],
+      "uniforms": [
+        {
+          "name": "ColorModulate",
+          "type": "vec4",
+          "values": [ 1.0, 1.0, 1.0, 1.0 ]
         }
       ],
       "output": "minecraft:main"

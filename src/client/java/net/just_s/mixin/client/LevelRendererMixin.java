@@ -1,6 +1,7 @@
 package net.just_s.mixin.client;
 
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.spongepowered.asm.mixin.injection.callback.LocalCapture.CAPTURE_FAILHARD;
 
@@ -56,19 +58,21 @@ public abstract class LevelRendererMixin {
             method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/PostChain;addToFrame(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;IILnet/minecraft/client/renderer/PostChain$TargetBundle;)V",
+                    target = "Lnet/minecraft/client/renderer/PostChain;addToFrame(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;IILnet/minecraft/client/renderer/PostChain$TargetBundle;Ljava/util/function/Consumer;)V",
                     ordinal = 1
             )
     )
-    private void possessive$onRenderLevel(PostChain instance, FrameGraphBuilder frameGraphBuilder, int i, int j, PostChain.TargetBundle targetBundle) {
+    private void possessive$onRenderLevel(PostChain instance, FrameGraphBuilder frameGraphBuilder, int i, int j, PostChain.TargetBundle targetBundle, Consumer<RenderPass> consumer) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
             PossessiveModClient.cameraHandler.getCamera().onCameraShader(
+                    instance,
                     frameGraphBuilder,
                     i, j,
-                    this.targets
+                    this.targets,
+                    consumer
             );
         } else {
-            instance.addToFrame(frameGraphBuilder, i, j, targetBundle);
+            instance.addToFrame(frameGraphBuilder, i, j, targetBundle, consumer);
         }
     }
 }

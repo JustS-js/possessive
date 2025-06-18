@@ -43,4 +43,18 @@ public class PossessiveModClient implements ClientModInitializer {
 			client.gameRenderer.setRenderHand(cameraHandler.getCamera().shouldRenderHand());
 		}
 	}
+
+	public static boolean isOccupiedFlag(int bitFlag) {
+		// 1XX...X (first bit from left)
+		int bitIndex = 31;
+		return 0 != (bitFlag & (1 << bitIndex));
+	}
+
+	public static int setOccupiedFlag(int bitFlag, boolean occupied) {
+		int bitIndex = 31;
+		if (occupied) {
+			return bitFlag | (1 << bitIndex);
+		}
+		return bitFlag & ~(1 << bitIndex);
+	}
 }
