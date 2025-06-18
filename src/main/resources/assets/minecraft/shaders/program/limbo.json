@@ -1,6 +1,6 @@
 {
-  "vertex": "minecraft:post/screenquad",
-  "fragment": "possessive:post/limbo",
+  "vertex": "screenquad",
+  "fragment": "limbo",
   "samplers": [
     { "name": "MainSampler" },
     { "name": "MainDepthSampler" },

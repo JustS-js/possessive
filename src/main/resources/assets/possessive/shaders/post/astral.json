@@ -62,7 +62,7 @@
       ]
     },
     {
-      "name": "possessive:astral",
+      "name": "limbo",
       "intarget": "swap",
       "outtarget": "final",
       "auxtargets": [
@@ -71,7 +71,7 @@
           "id": "minecraft:main"
         },
         {
-          "sampler_name": "MainDepthSampler",
+          "name": "MainDepthSampler",
           "id": "minecraft:main:depth"
         }
       ]

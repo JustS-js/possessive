@@ -145,10 +145,9 @@ public class AstralProjectionCamera extends AbstractCamera {
 
     @Override
     public ResourceLocation onCameraShader(String string) {
-        /*return ResourceLocation.fromNamespaceAndPath(
+        return ResourceLocation.fromNamespaceAndPath(
                 PossessiveModClient.MOD_ID, "shaders/post/astral.json"
-        );*/
-        return ResourceLocation.withDefaultNamespace("shaders/post/transparency.json");
+        );
     }
 
     @Override
