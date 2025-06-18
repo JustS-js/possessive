@@ -2,16 +2,6 @@
 
 uniform sampler2D MainSampler;
 uniform sampler2D MainDepthSampler;
-uniform sampler2D TranslucentSampler;
-uniform sampler2D TranslucentDepthSampler;
-uniform sampler2D ItemEntitySampler;
-uniform sampler2D ItemEntityDepthSampler;
-uniform sampler2D ParticlesSampler;
-uniform sampler2D ParticlesDepthSampler;
-uniform sampler2D WeatherSampler;
-uniform sampler2D WeatherDepthSampler;
-uniform sampler2D CloudsSampler;
-uniform sampler2D CloudsDepthSampler;
 
 uniform float GameTime;
 
