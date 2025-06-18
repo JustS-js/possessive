@@ -195,10 +195,10 @@ public class ArmorStandCamera extends AbstractCamera {
         compoundTag.put("Rotation", rotationTag);
 
         ListTag positionOffset = new ListTag();
-        positionOffset.add(DoubleTag.valueOf(x));
-        positionOffset.add(DoubleTag.valueOf(y));
-        positionOffset.add(DoubleTag.valueOf(z));
-        compoundTag.put("Pos", positionOffset);
+        positionOffset.add(DoubleTag.valueOf(x - possessedArmorStand.getX()));
+        positionOffset.add(DoubleTag.valueOf(y - possessedArmorStand.getY()));
+        positionOffset.add(DoubleTag.valueOf(z - possessedArmorStand.getZ()));
+        compoundTag.put("Move", positionOffset);
 
         this.putPossessionTag(compoundTag);
 
