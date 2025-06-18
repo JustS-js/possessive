@@ -1,6 +1,5 @@
 package net.just_s.camera;
 
-import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import net.just_s.PossessiveModClient;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GraphicsStatus;
@@ -8,8 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.LevelTargetBundle;
-import net.minecraft.client.renderer.PostChain;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
@@ -147,17 +144,11 @@ public class AstralProjectionCamera extends AbstractCamera {
     }
 
     @Override
-    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
-        PostChain astralShader = Minecraft.getInstance().getShaderManager().getPostChain(
-                ResourceLocation.fromNamespaceAndPath(
-                        PossessiveModClient.MOD_ID, "astral"
-                ),
-                LevelTargetBundle.SORTING_TARGETS
-        );
-        if (astralShader == null) {
-            return;
-        }
-        astralShader.addToFrame(frameGraphBuilder, width, height, targetBundle);
+    public ResourceLocation onCameraShader(String string) {
+        /*return ResourceLocation.fromNamespaceAndPath(
+                PossessiveModClient.MOD_ID, "shaders/post/astral.json"
+        );*/
+        return ResourceLocation.withDefaultNamespace("shaders/post/transparency.json");
     }
 
     @Override

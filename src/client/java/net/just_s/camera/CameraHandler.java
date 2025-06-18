@@ -2,7 +2,7 @@ package net.just_s.camera;
 
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.KeyboardInput;
 
 public class CameraHandler {
@@ -39,7 +39,7 @@ public class CameraHandler {
         client.setCameraEntity(client.player);
         if (camera != null) {
             camera.despawn();
-            camera.input = new ClientInput();
+            camera.input = new Input();
             camera = null;
         }
 

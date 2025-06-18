@@ -13,7 +13,7 @@ public interface LocalPlayerAccessor {
     @Accessor
     double getXLast();
     @Accessor
-    double getYLast();
+    double getYLast1();
     @Accessor
     double getZLast();
 

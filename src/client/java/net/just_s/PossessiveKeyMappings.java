@@ -93,7 +93,8 @@ public class PossessiveKeyMappings {
                 }
                 case ArmorStand armorStand -> {
                     CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
-                    if (armorStandTag.getBoolean("Silent")) {
+                    int disabledSlotsAsFlag = armorStandTag.getInt("DisabledSlots");
+                    if (PossessiveModClient.isOccupiedFlag(disabledSlotsAsFlag)) {
                         playBadAttemptToPossess(armorStand);
                         return;
                     }

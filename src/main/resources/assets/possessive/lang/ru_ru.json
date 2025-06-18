@@ -10,5 +10,7 @@
   "possessive.message.vessel_broken": "Сосуд разрушен.",
   "possessive.message.vessel_empty": "Вы фрагментированы.",
   "possessive.message.vessel_fail": "Сосуд отвергает Вас.",
-  "possessive.message.vessel_success": "Сосуд принимает Вас."
+  "possessive.message.vessel_success": "Сосуд принимает Вас.",
+  "armorposer.gui.label.sync_button": "Синхронизировать",
+  "armorposer.gui.tooltip.sync_button": "Синхронизировать позицию стойки для брони с Вашей камерой"
 }

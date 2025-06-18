@@ -1,7 +1,6 @@
 package net.just_s.camera;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -11,6 +10,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -61,6 +61,7 @@ public abstract class AbstractCamera extends LocalPlayer {
                         Minecraft.getInstance().screen,
                         Collections.emptyMap(),
                         Minecraft.getInstance().gui.getChat().storeState(),
+                        false,
                         Collections.emptyMap(),
                         ServerLinks.EMPTY
                 )
@@ -77,8 +78,6 @@ public abstract class AbstractCamera extends LocalPlayer {
 
         // Not to interfere with real entities in world. Should be negative.
         setId(id);
-        // Otherwise input is frozen until timeout
-        setClientLoaded(true);
         input = new KeyboardInput(client.options);
     }
 
@@ -176,24 +175,12 @@ public abstract class AbstractCamera extends LocalPlayer {
      * for your shader.
      * For examples see assets/post_shader/astral.json
      */
-    public void onCameraShader(FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
-        // noop
+    public ResourceLocation onCameraShader(String string) {
+        return ResourceLocation.withDefaultNamespace("shaders/post/transparency.json");
     }
 
-    // copied from PlayerRenderer.renderHand()
-    public void onRenderHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl) {
-        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        LocalPlayer entityToRender = Minecraft.getInstance().player;
-        PlayerRenderer entityRenderer = (PlayerRenderer) entityRenderDispatcher.getRenderer(entityToRender);
-
-        PlayerModel playerModel = entityRenderer.getModel();
-        modelPart.resetPose();
-        modelPart.visible = true;
-        playerModel.leftSleeve.visible = bl;
-        playerModel.rightSleeve.visible = bl;
-        playerModel.leftArm.zRot = -0.1F;
-        playerModel.rightArm.zRot = 0.1F;
-        modelPart.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(resourceLocation)), i, OverlayTexture.NO_OVERLAY);
+    public void onRenderHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, AbstractClientPlayer abstractClientPlayer, ModelPart modelPart, ModelPart modelPart2) {
+        // noop
     }
 
     public boolean onSendPosition() {
