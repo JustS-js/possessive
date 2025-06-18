@@ -138,18 +138,23 @@ public class ArmorStandCamera extends AbstractCamera {
 
     @Override
     public boolean onSendPosition() {
+        // check for player movement
         double dX = this.getX() - ((LocalPlayerAccessor)this).getXLast();
         double dY = this.getY() - ((LocalPlayerAccessor)this).getYLast();
         double dZ = this.getZ() - ((LocalPlayerAccessor)this).getZLast();
         double dYRot = (double) (this.getYRot() - ((LocalPlayerAccessor)this).getYRotLast());
         double dXRot = (double) (this.getXRot() - ((LocalPlayerAccessor)this).getXRotLast());
         int positionReminder = ((LocalPlayerAccessor)this).getPositionReminder() + 1;
-        boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4); // || positionReminder >= 20;
+        boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4) || positionReminder >= 3;
         boolean shouldUpdateAngle = dYRot != 0.0 || dXRot != 0.0;
 
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            CompoundTag compoundTag = this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ());
+            CompoundTag compoundTag = this.generateCompoundFromCamera(
+                    this.getX() - possessedArmorStand.getX(),
+                    this.getY() - possessedArmorStand.getY(),
+                    this.getZ() - possessedArmorStand.getZ()
+            );
             this.sendCompound(compoundTag);
         }
 
@@ -164,7 +169,7 @@ public class ArmorStandCamera extends AbstractCamera {
 		ClientPlayNetworking.send(new ArmorStandSyncPayload(data));
     }
 
-    private CompoundTag generateCompoundFromCamera(double x, double y, double z) {
+    private CompoundTag generateCompoundFromCamera(double dx, double dy, double dz) {
         CompoundTag original = possessedArmorStand.saveWithoutId(new CompoundTag());
         CompoundTag compoundTag = new CompoundTag();
 
@@ -195,9 +200,9 @@ public class ArmorStandCamera extends AbstractCamera {
         compoundTag.put("Rotation", rotationTag);
 
         ListTag positionOffset = new ListTag();
-        positionOffset.add(DoubleTag.valueOf(x - possessedArmorStand.getX()));
-        positionOffset.add(DoubleTag.valueOf(y - possessedArmorStand.getY()));
-        positionOffset.add(DoubleTag.valueOf(z - possessedArmorStand.getZ()));
+        positionOffset.add(DoubleTag.valueOf(dx));
+        positionOffset.add(DoubleTag.valueOf(dy));
+        positionOffset.add(DoubleTag.valueOf(dz));
         compoundTag.put("Move", positionOffset);
 
         this.putPossessionTag(compoundTag);

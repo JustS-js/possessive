@@ -30,7 +30,7 @@
 		"minecraft": "~1.21.4",
 		"java": ">=21",
 		"fabric-api": "*",
-		"armorposer": ">=8.0.1"
+		"armorposer": ">=8.1.1"
 	},
 	"accessWidener" : "possessive.accesswidener"
 }
