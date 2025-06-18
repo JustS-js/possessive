@@ -47,6 +47,11 @@ public class ArmorStandCamera extends AbstractCamera {
     private float animationIntensity = 0;
     private float animationState = 0;
 
+    private double prevX;
+    private double prevY;
+    private double prevZ;
+    private boolean hadGravity;
+
     private static final ResourceLocation ITEM_SLOT_SPRITE = ResourceLocation.fromNamespaceAndPath(PossessiveModClient.MOD_ID, "hud/item_slot");
 
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
@@ -54,6 +59,11 @@ public class ArmorStandCamera extends AbstractCamera {
 
         this.possessedArmorStand = possessedArmorStand;
         this.copyPosition(possessedArmorStand);
+
+        this.prevX = this.getX();
+        this.prevY = this.getY();
+        this.prevZ = this.getZ();
+        this.hadGravity = !possessedArmorStand.isNoGravity();
 
         this.setPushable(true);
         this.setAbilityToChangePerspective(true);
@@ -136,25 +146,35 @@ public class ArmorStandCamera extends AbstractCamera {
         super.tick();
     }
 
+    public void syncArmorStandPos() {
+        CompoundTag compoundTag = this.generateCompoundFromCamera(
+                this.getX() - possessedArmorStand.getX(),
+                this.getY() - possessedArmorStand.getY(),
+                this.getZ() - possessedArmorStand.getZ()
+        );
+        this.sendCompound(compoundTag);
+    }
+
     @Override
     public boolean onSendPosition() {
         // check for player movement
-        double dX = this.getX() - ((LocalPlayerAccessor)this).getXLast();
-        double dY = this.getY() - ((LocalPlayerAccessor)this).getYLast();
-        double dZ = this.getZ() - ((LocalPlayerAccessor)this).getZLast();
+        int positionReminder = ((LocalPlayerAccessor)this).getPositionReminder() + 1;
+
+        double dX = this.getX() - prevX;
+        double dY = this.getY() - prevY;
+        double dZ = this.getZ() - prevZ;
+        prevX = this.getX();
+        prevY = this.getY();
+        prevZ = this.getZ();
         double dYRot = (double) (this.getYRot() - ((LocalPlayerAccessor)this).getYRotLast());
         double dXRot = (double) (this.getXRot() - ((LocalPlayerAccessor)this).getXRotLast());
-        int positionReminder = ((LocalPlayerAccessor)this).getPositionReminder() + 1;
-        boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4) || positionReminder >= 3;
+
+        boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4); // || positionReminder >= 3;
         boolean shouldUpdateAngle = dYRot != 0.0 || dXRot != 0.0;
 
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            CompoundTag compoundTag = this.generateCompoundFromCamera(
-                    this.getX() - possessedArmorStand.getX(),
-                    this.getY() - possessedArmorStand.getY(),
-                    this.getZ() - possessedArmorStand.getZ()
-            );
+            CompoundTag compoundTag = this.generateCompoundFromCamera(dX, dY, dZ);
             this.sendCompound(compoundTag);
         }
 
@@ -205,6 +225,8 @@ public class ArmorStandCamera extends AbstractCamera {
         positionOffset.add(DoubleTag.valueOf(dz));
         compoundTag.put("Move", positionOffset);
 
+        compoundTag.putBoolean("NoGravity", true);
+
         this.putPossessionTag(compoundTag);
 
         return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
@@ -220,6 +242,9 @@ public class ArmorStandCamera extends AbstractCamera {
 
     private void updatePossessionTag(CompoundTag compoundTag, boolean remove) {
         compoundTag.putBoolean("Silent", !remove);
+        if (remove) {
+            compoundTag.putBoolean("NoGravity", !this.hadGravity);
+        }
     }
 
     public void tickAnimation() {
