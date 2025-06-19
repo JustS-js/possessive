@@ -2,18 +2,8 @@
 
 uniform sampler2D MainSampler;
 uniform sampler2D MainDepthSampler;
-uniform sampler2D TranslucentSampler;
-uniform sampler2D TranslucentDepthSampler;
-uniform sampler2D ItemEntitySampler;
-uniform sampler2D ItemEntityDepthSampler;
-uniform sampler2D ParticlesSampler;
-uniform sampler2D ParticlesDepthSampler;
-uniform sampler2D WeatherSampler;
-uniform sampler2D WeatherDepthSampler;
-uniform sampler2D CloudsSampler;
-uniform sampler2D CloudsDepthSampler;
 
-uniform float GameTime;
+uniform float Time;
 
 in vec2 texCoord;
 in vec2 oneTexel;
@@ -21,7 +11,7 @@ in vec2 oneTexel;
 out vec4 fragColor;
 
 float noise(vec2 coord) {
-    return fract( sin(coord.x*111.+ coord.y*532.) * 2556. * cos(GameTime));
+    return fract( sin(coord.x*111.+ coord.y*532.) * 2556. * cos(Time / 50));
 }
 vec3 smoothNoise(vec2 coord) {
     vec2 local_coord = fract(coord);
@@ -50,7 +40,7 @@ vec3 perlin(vec2 coord) {
     color += smoothNoise(coord * 64.) * .0625;
 
     color /= 2;
-    return clamp(color + clamp(cos(mod(GameTime * 20, 1.) * 3.14 * 2), -0.3, 0.3), 0, 1);
+    return clamp(color + clamp(cos(Time / 100 * 3.14 * 2), -0.3, 0.3), 0, 1);
 }
 
 float greeneness(vec3 color) {
