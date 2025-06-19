@@ -1,6 +1,7 @@
 package net.just_s.camera;
 
 import net.just_s.PossessiveModClient;
+import net.just_s.mixin.client.LevelRendererAccessor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
@@ -8,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
@@ -64,6 +64,7 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
             this.minecraft.options.graphicsMode().set(GraphicsStatus.FABULOUS);
             this.minecraft.options.save();
+            ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeInitTransparency();
         }
         savedGamma = this.minecraft.options.gamma().get();
         this.minecraft.options.gamma().set(100d);
@@ -76,6 +77,7 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
             this.minecraft.options.graphicsMode().set(storedGraphicStatus);
             this.minecraft.options.save();
+            ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeDeinitTransparency();
         }
     }
 
@@ -144,10 +146,8 @@ public class AstralProjectionCamera extends AbstractCamera {
     }
 
     @Override
-    public ResourceLocation onCameraShader(String string) {
-        return ResourceLocation.fromNamespaceAndPath(
-                PossessiveModClient.MOD_ID, "shaders/post/astral.json"
-        );
+    public boolean onCameraShader() {
+        return true;
     }
 
     @Override
