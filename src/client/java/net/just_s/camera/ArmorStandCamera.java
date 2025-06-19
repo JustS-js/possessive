@@ -40,7 +40,7 @@ public class ArmorStandCamera extends AbstractCamera {
 
     private CompoundTag savedPose;
     private boolean animateMoving = false;
-    private static float animationSpeed = 0.3f;
+    private static float animationSpeed = 0.4f;
     private static float animationMultiplier = 3;
     private static float animationMaxAngle = 30f;
     private float animationAngle = 0f;
@@ -143,6 +143,7 @@ public class ArmorStandCamera extends AbstractCamera {
             attributeMap.getInstance(Attributes.STEP_HEIGHT).setBaseValue(asScale * 0.6f);
             attributeMap.getInstance(Attributes.JUMP_STRENGTH).setBaseValue(0.41f + 0.1f * asScale);
         }
+        this.tickAnimation();
         this.onSendPosition();
         super.tick();
 
@@ -173,13 +174,10 @@ public class ArmorStandCamera extends AbstractCamera {
 
         boolean shouldUpdateMovement = Mth.lengthSquared(dX, dY, dZ) > Mth.square(2.0E-4); // || positionReminder >= 3;
         boolean shouldUpdateAngle = dYRot != 0.0 || dXRot != 0.0;
-
-        this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
             CompoundTag compoundTag = this.generateCompoundFromCamera(dX, dY, dZ);
             this.sendCompound(compoundTag);
         }
-
         return false;
     }
 
@@ -257,7 +255,7 @@ public class ArmorStandCamera extends AbstractCamera {
         float size = this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale();
         float appliedSpeed = animationSpeed * 1 / size;
         animationAngle = (float) ((animationAngle + appliedSpeed) % (2 * Math.PI));
-        animationIntensity = Math.clamp((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 0f, 1f);
+        animationIntensity = Math.clamp((float)(Math.abs(this.getX() - prevX) + Math.abs(this.getZ() - prevZ)) * animationMultiplier, 0f, 1f);
         animationState = (float) Math.sin(animationAngle) * animationMaxAngle * animationIntensity;
         if (Float.compare(0f, animationIntensity) == 1) {
             animationAngle = 0;
