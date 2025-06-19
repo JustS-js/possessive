@@ -1,8 +1,6 @@
 package net.just_s.camera;
 
-import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LevelRendererAccessor;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,6 +11,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class AstralProjectionCamera extends AbstractCamera {
@@ -47,7 +46,7 @@ public class AstralProjectionCamera extends AbstractCamera {
             position.moveForward(negative ? -1 * increment : increment);
             applyPosition(position);
 
-            if (!wouldNotSuffocateAtTargetPose(getPose())) {
+            if (!canEnterPose(getPose())) {
                 // Revert to last non-colliding position and return whether we were unable to move at all
                 applyPosition(oldPosition);
                 return distance > 0;
@@ -55,6 +54,12 @@ public class AstralProjectionCamera extends AbstractCamera {
         }
 
         return true;
+    }
+
+    private boolean suffocatesAt(BlockPos blockPos) {
+        AABB aABB = this.getBoundingBox();
+        AABB aABB2 = (new AABB((double)blockPos.getX(), aABB.minY, (double)blockPos.getZ(), (double)blockPos.getX() + 1.0, aABB.maxY, (double)blockPos.getZ() + 1.0)).deflate(1.0E-7);
+        return this.level().collidesWithSuffocatingBlock(this, aABB2);
     }
 
     @Override
@@ -151,7 +156,7 @@ public class AstralProjectionCamera extends AbstractCamera {
     }
 
     @Override
-    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, float f) {
         return true;
     }
 }

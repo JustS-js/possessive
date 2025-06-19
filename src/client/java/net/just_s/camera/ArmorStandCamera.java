@@ -1,12 +1,12 @@
 package net.just_s.camera;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrbysco.armorposer.Reference;
 import com.mrbysco.armorposer.data.SyncData;
-import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.*;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -53,7 +54,7 @@ public class ArmorStandCamera extends AbstractCamera {
     private double prevZ;
     private boolean hadGravity;
 
-    private static final ResourceLocation ITEM_SLOT_SPRITE = ResourceLocation.fromNamespaceAndPath(PossessiveModClient.MOD_ID, "hud/item_slot");
+    private static final ResourceLocation ITEM_SLOT_SPRITE = new ResourceLocation(PossessiveModClient.MOD_ID, "textures/gui/sprites/item_slot.png");
 
     public ArmorStandCamera(Minecraft client, ArmorStand possessedArmorStand) {
         super(client, -120);
@@ -131,19 +132,19 @@ public class ArmorStandCamera extends AbstractCamera {
                         d, e, f
                 );
             }
-            camera.playSound(SoundEvents.APPLY_EFFECT_RAID_OMEN, 1f, 1f);
+            camera.playSound(SoundEvents.PLAYER_BREATH, 1f, 1f);
             Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.vessel_broken"), false);
             return;
         }
 
         //LOGGER.info(this.getScale() + " | " + this.possessedArmorStand.getScale() + " | " + this.possessedArmorStand.getAgeScale());
-        float asScale = this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale();
+        /*float asScale = this.possessedArmorStand.getScale() * this.possessedArmorStand.getScale();
         if (this.getScale() != asScale) {
             AttributeMap attributeMap = this.getAttributes();
-            attributeMap.getInstance(Attributes.SCALE).setBaseValue(asScale);
-            attributeMap.getInstance(Attributes.STEP_HEIGHT).setBaseValue(asScale * 0.6f);
-            attributeMap.getInstance(Attributes.JUMP_STRENGTH).setBaseValue(0.41f + 0.1f * asScale);
-        }
+            //attributeMap.getInstance(Attributes.).setBaseValue(asScale);
+            //attributeMap.getInstance(Attributes.STEP_HEIGHT).setBaseValue(asScale * 0.6f);
+            //attributeMap.getInstance(Attributes.JUMP_STRENGTH).setBaseValue(0.41f + 0.1f * asScale);
+        }*/
         super.tick();
     }
 
@@ -175,7 +176,7 @@ public class ArmorStandCamera extends AbstractCamera {
 
         this.tickAnimation();
         if (shouldUpdateMovement || shouldUpdateAngle) {
-            CompoundTag compoundTag = this.generateCompoundFromCamera(dX, dY, dZ);
+            CompoundTag compoundTag = this.generateCompoundFromCamera(this.getX(), this.getY(), this.getZ());
             this.sendCompound(compoundTag);
         }
 
@@ -183,11 +184,13 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     private void sendCompound(CompoundTag armorStandCompound) {
+        FriendlyByteBuf buf = PacketByteBufs.create();
         SyncData data = new SyncData(
-            possessedArmorStand.getUUID(),
-            armorStandCompound
-		);
-		ClientPlayNetworking.send(new ArmorStandSyncPayload(data));
+                possessedArmorStand.getUUID(),
+                armorStandCompound
+        );
+        data.encode(buf);
+        ClientPlayNetworking.send(Reference.SYNC_PACKET_ID, buf);
     }
 
     private CompoundTag generateCompoundFromCamera(double dx, double dy, double dz) {
@@ -224,7 +227,7 @@ public class ArmorStandCamera extends AbstractCamera {
         positionOffset.add(DoubleTag.valueOf(dx));
         positionOffset.add(DoubleTag.valueOf(dy));
         positionOffset.add(DoubleTag.valueOf(dz));
-        compoundTag.put("Move", positionOffset);
+        compoundTag.put("Pos", positionOffset);
 
         compoundTag.putBoolean("NoGravity", true);
 
@@ -253,7 +256,7 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     public void tickAnimation() {
-        float size = this.possessedArmorStand.getScale() * this.possessedArmorStand.getAgeScale();
+        float size = this.possessedArmorStand.getScale() * this.possessedArmorStand.getScale();
         float appliedSpeed = animationSpeed * 1 / size;
         animationAngle = (float) ((animationAngle + appliedSpeed) % (2 * Math.PI));
         animationIntensity = Math.clamp((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 0f, 1f);
@@ -373,12 +376,12 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     @Override
-    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        renderArmorStandItemHotbar(guiGraphics, deltaTracker);
+    public boolean onRenderHotbarAndDecorations(GuiGraphics guiGraphics, float f) {
+        renderArmorStandItemHotbar(guiGraphics, f);
         return true;
     }
 
-    private void renderArmorStandItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    private void renderArmorStandItemHotbar(GuiGraphics guiGraphics, float f) {
         if (minecraft.player == null) {
             return;
         }
@@ -389,23 +392,22 @@ public class ArmorStandCamera extends AbstractCamera {
         guiGraphics.pose().pushPose();
 
         guiGraphics.pose().translate(0.0F, 0.0F, -90.0F);
-        guiGraphics.blitSprite(ITEM_SLOT_SPRITE, x_mid - 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
-        guiGraphics.blitSprite(ITEM_SLOT_SPRITE, x_mid + 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
+        guiGraphics.blit(ITEM_SLOT_SPRITE, x_mid - 46 - 11, guiGraphics.guiHeight() - 22, 0, 0, 0, 22, 22, 22, 22);
+        guiGraphics.blit(ITEM_SLOT_SPRITE, x_mid + 46 - 11, guiGraphics.guiHeight() - 22, 0, 0, 0, 22, 22, 22, 22);
 
         guiGraphics.pose().popPose();
 
         int y = guiGraphics.guiHeight() - 16 - 3;
         if (!leftHandItemStack.isEmpty()) {
-            this.renderSlot(guiGraphics, x_mid - 46 - 8, y, deltaTracker, leftHandItemStack, 0);
+            this.renderSlot(guiGraphics, x_mid - 46 - 8, y, f, leftHandItemStack);
         }
         if (!rightHandItemStack.isEmpty()) {
-            this.renderSlot(guiGraphics, x_mid + 46 - 8, y, deltaTracker, rightHandItemStack, 0);
+            this.renderSlot(guiGraphics, x_mid + 46 - 8, y, f, rightHandItemStack);
         }
     }
 
-    private void renderSlot(GuiGraphics guiGraphics, int i, int j, DeltaTracker deltaTracker, ItemStack itemStack, int k) {
+    private void renderSlot(GuiGraphics guiGraphics, int i, int j, float f, ItemStack itemStack) {
         if (!itemStack.isEmpty()) {
-            float f = (float)itemStack.getPopTime() - deltaTracker.getGameTimeDeltaPartialTick(false);
             if (f > 0.0F) {
                 float g = 1.0F + f / 5.0F;
                 guiGraphics.pose().pushPose();
@@ -414,7 +416,7 @@ public class ArmorStandCamera extends AbstractCamera {
                 guiGraphics.pose().translate((float)(-(i + 8)), (float)(-(j + 12)), 0.0F);
             }
 
-            guiGraphics.renderFakeItem(itemStack, i, j, k);
+            guiGraphics.renderFakeItem(itemStack, i, j);
             if (f > 0.0F) {
                 guiGraphics.pose().popPose();
             }

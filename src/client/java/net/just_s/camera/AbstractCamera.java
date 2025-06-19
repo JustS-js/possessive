@@ -2,19 +2,17 @@ package net.just_s.camera;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.ServerLinks;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -43,21 +41,11 @@ public abstract class AbstractCamera extends LocalPlayer {
     static {
         NETWORK_HANDLER = new ClientPacketListener(
                 Minecraft.getInstance(),
+                Minecraft.getInstance().screen,
                 Minecraft.getInstance().getConnection().getConnection(),
-                new CommonListenerCookie(
-                        new GameProfile(UUID.randomUUID(), "Camera"),
-                        Minecraft.getInstance().getTelemetryManager().createWorldSessionManager(false, null, null),
-                        Minecraft.getInstance().player.registryAccess().freeze(),
-                        FeatureFlagSet.of(),
-                        null,
-                        Minecraft.getInstance().getCurrentServer(),
-                        Minecraft.getInstance().screen,
-                        Collections.emptyMap(),
-                        Minecraft.getInstance().gui.getChat().storeState(),
-                        false,
-                        Collections.emptyMap(),
-                        ServerLinks.EMPTY
-                )
+                Minecraft.getInstance().getCurrentServer(),
+                new GameProfile(UUID.randomUUID(), "Camera"),
+                Minecraft.getInstance().getTelemetryManager().createWorldSessionManager(false, null, null)
         ) {
             @Override
             public void send(Packet<?> packet) {
@@ -80,7 +68,7 @@ public abstract class AbstractCamera extends LocalPlayer {
 
     public void spawn() {
         if (clientLevel != null) {
-            clientLevel.addEntity(this);
+            clientLevel.addPlayer(Integer.MAX_VALUE - 5, this);
         }
     }
 
@@ -200,7 +188,7 @@ public abstract class AbstractCamera extends LocalPlayer {
         return true;
     }
 
-    public boolean  onRenderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public boolean  onRenderHotbarAndDecorations(GuiGraphics guiGraphics, float f) {
         return false;
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -22,6 +23,7 @@ public class PossessiveKeyMappings {
     private static KeyMapping possessKeyMapping;
     private static KeyMapping savePoseKeyMapping;
     private static KeyMapping loadPoseKeyMapping;
+    private static final RandomSource random = RandomSource.create();
 
     public static void registerModKeyMappings() {
         possessKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
@@ -66,7 +68,7 @@ public class PossessiveKeyMappings {
                 playFeedback(
                         PossessiveModClient.cameraHandler.getCamera(),
                         ParticleTypes.POOF,
-                        SoundEvents.APPLY_EFFECT_TRIAL_OMEN, 1f, 1f,
+                        SoundEvents.PLAYER_BREATH, 1f, 1f,
                         "possessive.message.vessel_empty"
                 );
                 return;
@@ -113,7 +115,7 @@ public class PossessiveKeyMappings {
         playFeedback(
                 entity,
                 ParticleTypes.POOF,
-                SoundEvents.APPLY_EFFECT_TRIAL_OMEN, 1f, 1f,
+                SoundEvents.PLAYER_BREATH, 1f, 1f,
                 "possessive.message.vessel_success"
         );
     }
@@ -130,9 +132,9 @@ public class PossessiveKeyMappings {
     private static void playFeedback(Entity entity, ParticleOptions particleOptions, SoundEvent soundEvent, float volume, float pitch, String translatable) {
         Entity camera = Minecraft.getInstance().cameraEntity;
         for(int i = 0; i < 20; ++i) {
-            double d = camera.getRandom().nextGaussian() * 0.02;
-            double e = camera.getRandom().nextGaussian() * 0.02;
-            double f = camera.getRandom().nextGaussian() * 0.02;
+            double d = random.nextGaussian() * 0.02;
+            double e = random.nextGaussian() * 0.02;
+            double f = random.nextGaussian() * 0.02;
             camera.level().addParticle(
                     particleOptions,
                     entity.getRandomX(1.0) - d * 10.0,

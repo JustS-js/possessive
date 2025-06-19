@@ -6,13 +6,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.just_s.PossessiveModClient;
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -49,9 +47,10 @@ public abstract class LevelRendererMixin {
     }
 
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void possessive$renderPlayer(DeltaTracker deltaTracker, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci, TickRateManager tickRateManager, float partialTick, ProfilerFiller profilerFiller, Vec3 cameraPosition, double x, double y, double z, boolean frustumNotNull, Frustum frustum, float renderDistance, boolean fog, Matrix4fStack modelViewStack, boolean bl4, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource) {
+    private void possessive$renderPlayer(PoseStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightmapTextureManager, Matrix4f positionMatrix, CallbackInfo ci) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
-            renderEntity(Minecraft.getInstance().player, x, y, z, partialTick, poseStack, renderBuffers.bufferSource());
+            Vec3 cameraPos = camera.getPosition();
+            renderEntity(Minecraft.getInstance().player, cameraPos.x, cameraPos.y, cameraPos.z, tickDelta, matrices, renderBuffers.bufferSource());
         }
     }
 
@@ -98,7 +97,7 @@ public abstract class LevelRendererMixin {
     )
     private void possessive$initAstral(CallbackInfo ci) {
         try {
-            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(PossessiveModClient.MOD_ID, "shaders/post/astral.json");
+            ResourceLocation resourceLocation = new ResourceLocation(PossessiveModClient.MOD_ID, "shaders/post/astral.json");
             astralChain = new PostChain(this.minecraft.getTextureManager(), this.minecraft.getResourceManager(), this.minecraft.getMainRenderTarget(), resourceLocation);
             astralChain.resize(this.minecraft.getWindow().getWidth(), this.minecraft.getWindow().getHeight());
             this.astralTranslucentTarget = astralChain.getTempTarget("translucent");

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ClientPacketListenerMixin",
+    "ConnectionMixin",
     "EntityMixin",
     "GameRendererMixin",
     "GuiMixin",

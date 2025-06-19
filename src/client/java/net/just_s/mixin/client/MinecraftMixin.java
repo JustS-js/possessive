@@ -46,10 +46,4 @@ public class MinecraftMixin {
         }
         return value;
     }
-
-    // Disables Camera if the player disconnects.
-    @Inject(method = "disconnect()V", at = @At(value = "HEAD"))
-    private void possessive$onDisconnect(CallbackInfo ci) {
-        PossessiveModClient.cameraHandler.disableCamera();
-    }
 }
