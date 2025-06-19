@@ -84,29 +84,27 @@ public class PossessiveKeyMappings {
                 return;
             }
 
-            switch (entity) {
-                case LocalPlayer player -> {
-                    if (!player.getUUID().equals(client.player.getUUID())) {
-                        playBadAttemptToPossess(player);
-                        return;
-                    }
-                    PossessiveModClient.cameraHandler.disableCamera();
-                    playGoodAttemptToPossess(player);
+            if (entity instanceof LocalPlayer player) {
+                if (!player.getUUID().equals(client.player.getUUID())) {
+                    playBadAttemptToPossess(player);
+                    return;
                 }
-                case ArmorStand armorStand -> {
-                    CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
-                    int disabledSlotsAsFlag = armorStandTag.getInt("DisabledSlots");
-                    if (PossessiveModClient.isOccupiedFlag(disabledSlotsAsFlag)) {
-                        playBadAttemptToPossess(armorStand);
-                        return;
-                    }
+                PossessiveModClient.cameraHandler.disableCamera();
+                playGoodAttemptToPossess(player);
+            } else if (entity instanceof ArmorStand armorStand) {
+                CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
+                int disabledSlotsAsFlag = armorStandTag.getInt("DisabledSlots");
+                if (PossessiveModClient.isOccupiedFlag(disabledSlotsAsFlag)) {
+                    playBadAttemptToPossess(armorStand);
+                    return;
+                }
 
-                    PossessiveModClient.cameraHandler.enableCamera(
-                            new ArmorStandCamera(client, armorStand)
-                    );
-                    playGoodAttemptToPossess(armorStand);
-                }
-                default -> playBadAttemptToPossess(entity);
+                PossessiveModClient.cameraHandler.enableCamera(
+                        new ArmorStandCamera(client, armorStand)
+                );
+                playGoodAttemptToPossess(armorStand);
+            } else {
+                playBadAttemptToPossess(entity);
             }
         }
     }

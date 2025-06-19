@@ -259,7 +259,7 @@ public class ArmorStandCamera extends AbstractCamera {
         float size = this.possessedArmorStand.getScale() * this.possessedArmorStand.getScale();
         float appliedSpeed = animationSpeed * 1 / size;
         animationAngle = (float) ((animationAngle + appliedSpeed) % (2 * Math.PI));
-        animationIntensity = Math.clamp((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 0f, 1f);
+        animationIntensity = Math.max(0f, Math.min((float)(Math.abs(this.xOld - this.getX()) + Math.abs(this.zOld - this.getZ())) * animationMultiplier, 1f));
         animationState = (float) Math.sin(animationAngle) * animationMaxAngle * animationIntensity;
         if (Float.compare(0f, animationIntensity) == 1) {
             animationAngle = 0;
