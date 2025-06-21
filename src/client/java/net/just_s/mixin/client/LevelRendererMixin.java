@@ -121,18 +121,20 @@ public abstract class LevelRendererMixin {
             )
     )
     private void possessive$deinitAstral(CallbackInfo ci) {
-        this.astralChain.close();
-        this.astralTranslucentTarget.destroyBuffers();
-        this.astralItemEntityTarget.destroyBuffers();
-        this.astralParticlesTarget.destroyBuffers();
-        this.astralWeatherTarget.destroyBuffers();
-        this.astralCloudsTarget.destroyBuffers();
-        this.astralChain = null;
-        this.astralTranslucentTarget = null;
-        this.astralItemEntityTarget = null;
-        this.astralParticlesTarget = null;
-        this.astralWeatherTarget = null;
-        this.astralCloudsTarget = null;
+        if (this.astralChain != null) {
+            this.astralChain.close();
+            this.astralTranslucentTarget.destroyBuffers();
+            this.astralItemEntityTarget.destroyBuffers();
+            this.astralParticlesTarget.destroyBuffers();
+            this.astralWeatherTarget.destroyBuffers();
+            this.astralCloudsTarget.destroyBuffers();
+            this.astralChain = null;
+            this.astralTranslucentTarget = null;
+            this.astralItemEntityTarget = null;
+            this.astralParticlesTarget = null;
+            this.astralWeatherTarget = null;
+            this.astralCloudsTarget = null;
+        }
     }
 
     @Inject(
