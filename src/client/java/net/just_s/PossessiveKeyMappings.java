@@ -22,6 +22,10 @@ public class PossessiveKeyMappings {
     private static KeyMapping possessKeyMapping;
     private static KeyMapping savePoseKeyMapping;
     private static KeyMapping loadPoseKeyMapping;
+    private static KeyMapping returnToPlayerKeyMapping;
+    
+    private static long lastKPressTime = 0;
+    private static final long DOUBLE_CLICK_TIME = 300;
 
     public static void registerModKeyMappings() {
         possessKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
@@ -47,6 +51,14 @@ public class PossessiveKeyMappings {
                 "category.possessive"
         ));
         ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::loadPoseKeyPress);
+        
+        returnToPlayerKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.possessive.return_to_player",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_K,
+                "category.possessive"
+        ));
+        ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::returnToPlayerKeyPress);
     }
 
     private static void possessKeyPress(Minecraft client) {
@@ -185,6 +197,31 @@ public class PossessiveKeyMappings {
             camera.applySavedPose();
             Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.load_pose"), false);
             camera.playSound(SoundEvents.ARMOR_STAND_HIT, 0.5f, 1.2f);
+        }
+    }
+
+    private static void returnToPlayerKeyPress(Minecraft client) {
+        if (client.player == null) {
+            return;
+        }
+
+        while (returnToPlayerKeyMapping.consumeClick()) {
+            long currentTime = System.currentTimeMillis();
+            
+            if (currentTime - lastKPressTime < DOUBLE_CLICK_TIME) {
+                if (PossessiveModClient.cameraHandler.isEnabled()) {
+                    PossessiveModClient.cameraHandler.disableCamera();
+                    playFeedback(
+                            client.player,
+                            ParticleTypes.POOF,
+                            SoundEvents.APPLY_EFFECT_TRIAL_OMEN, 1f, 1f,
+                            "possessive.message.return_to_player"
+                    );
+                }
+                lastKPressTime = 0;
+            } else {
+                lastKPressTime = currentTime;
+            }
         }
     }
 }
