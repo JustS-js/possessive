@@ -46,7 +46,7 @@ dependencies {
 	implementation "com.mrbysco.armorposer:ArmorPoser-common-${project.minecraft_version}:${project.armor_poser_version}"
 
 	modCompileOnly "maven.modrinth:freecam:${project.freecam_version}"
-	
+	modCompileOnly "maven.modrinth:player-armor-stands:${project.pas_version}"
 }
 
 processResources {

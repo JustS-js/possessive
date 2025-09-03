@@ -1,10 +1,12 @@
 package net.just_s.camera;
 
+import com.danrus.render.models.PASModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.armorposer.Reference;
 import com.mrbysco.armorposer.data.SyncData;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.loader.api.FabricLoader;
 import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
 import net.minecraft.client.Minecraft;
@@ -326,9 +328,9 @@ public class ArmorStandCamera extends AbstractCamera {
 
         ModelPart armorStandArm;
         if (modelPart.equals(playerModel.rightArm)) {
-            armorStandArm = armorStandModel.rightArm;
+            armorStandArm = (FabricLoader.getInstance().isModLoaded("pas")) ? ((PASModel)armorStandModel).originalRightArm : armorStandModel.rightArm;
         } else {
-            armorStandArm = armorStandModel.leftArm;
+            armorStandArm = (FabricLoader.getInstance().isModLoaded("pas")) ? ((PASModel)armorStandModel).originalLeftArm :armorStandModel.leftArm;
         }
         armorStandArm.resetPose();
         armorStandArm.visible = true;
