@@ -77,8 +77,6 @@ public abstract class AbstractCamera extends LocalPlayer {
 
         // Not to interfere with real entities in world. Should be negative.
         setId(id);
-        // Otherwise input is frozen until timeout
-        setClientLoaded(true);
         input = new KeyboardInput(client.options);
     }
 
