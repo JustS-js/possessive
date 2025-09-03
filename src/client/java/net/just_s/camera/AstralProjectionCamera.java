@@ -69,7 +69,9 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
             this.minecraft.options.graphicsMode().set(GraphicsStatus.FABULOUS);
             this.minecraft.options.save();
-            ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeInitTransparency();
+            this.minecraft.execute(
+                    () -> ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeInitTransparency()
+            );
         }
         savedGamma = this.minecraft.options.gamma().get();
         this.minecraft.options.gamma().set(100d);
@@ -82,7 +84,10 @@ public class AstralProjectionCamera extends AbstractCamera {
         if (!(storedGraphicStatus.equals(GraphicsStatus.FABULOUS))) {
             this.minecraft.options.graphicsMode().set(storedGraphicStatus);
             this.minecraft.options.save();
-            ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeDeinitTransparency();
+            this.minecraft.execute(
+                    () -> ((LevelRendererAccessor)this.minecraft.levelRenderer).invokeDeinitTransparency()
+            );
+
         }
     }
 
