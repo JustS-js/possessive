@@ -318,9 +318,9 @@ public class ArmorStandCamera extends AbstractCamera {
 
         ModelPart armorStandArm;
         if (modelPart.equals(playerModel.rightArm)) {
-            armorStandArm = armorStandModel.rightArm;
+            armorStandArm = armorStandModel.getAnyDescendantWithName("original_right_arm").orElse(armorStandModel.rightArm);
         } else {
-            armorStandArm = armorStandModel.leftArm;
+            armorStandArm = armorStandModel.getAnyDescendantWithName("original_left_arm").orElse(armorStandModel.leftArm);
         }
         armorStandArm.resetPose();
         armorStandArm.visible = true;
