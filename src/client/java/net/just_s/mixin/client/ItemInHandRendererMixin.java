@@ -4,10 +4,12 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.just_s.PossessiveModClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
@@ -16,6 +18,9 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ItemInHandRenderer.class)
 public class ItemInHandRendererMixin {
+
+    @Unique
+    private float possessive$tickDelta;
 
     @Inject(
             method = "renderHandsWithItems",
@@ -43,6 +48,11 @@ public class ItemInHandRendererMixin {
         }
     }
 
+    @Inject(method = "renderHandsWithItems", at = @At("HEAD"))
+    private void storeTickDelta(float tickDelta, PoseStack matrices, MultiBufferSource.BufferSource vertexConsumers, LocalPlayer player, int light, CallbackInfo ci) {
+        possessive$tickDelta = tickDelta;
+    }
+
     @ModifyArgs(
             method = "renderHandsWithItems",
             at = @At(
@@ -54,6 +64,8 @@ public class ItemInHandRendererMixin {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
             // 3rd arg is InteractionHand, 5th arg is ItemStack
             args.set(5, PossessiveModClient.cameraHandler.getCamera().getItemToRender(args.get(3)));
+            // 9th arg is light level
+            args.set(9, Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(PossessiveModClient.cameraHandler.getCamera(), possessive$tickDelta));
         }
     }
 }
