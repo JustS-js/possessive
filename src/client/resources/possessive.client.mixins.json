@@ -12,6 +12,7 @@
     "LocalPlayerAccessor",
     "LocalPlayerMixin",
     "MinecraftMixin",
+    "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OptionsMixin",
     "PlayerRendererMixin",
