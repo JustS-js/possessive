@@ -34,7 +34,7 @@ public abstract class LevelRendererMixin {
     @Shadow @Final private LevelTargetBundle targets;
 
     @Inject(method = "renderEntities", at = @At("TAIL"), locals = CAPTURE_FAILHARD)
-    private void possessive$onRenderEntities(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Camera camera, DeltaTracker deltaTracker, List<Entity> list, CallbackInfo ci) {
+    private void possessive$renderPlayerOriginalBodyWhenPossessing(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Camera camera, DeltaTracker deltaTracker, List<Entity> list, CallbackInfo ci) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
             Vec3 position = camera.getPosition();
             float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
