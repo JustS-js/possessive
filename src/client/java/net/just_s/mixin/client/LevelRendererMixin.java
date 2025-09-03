@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -58,21 +59,20 @@ public abstract class LevelRendererMixin {
             method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/PostChain;addToFrame(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;IILnet/minecraft/client/renderer/PostChain$TargetBundle;Ljava/util/function/Consumer;)V",
+                    target = "Lnet/minecraft/client/renderer/PostChain;addToFrame(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;IILnet/minecraft/client/renderer/PostChain$TargetBundle;)V",
                     ordinal = 1
             )
     )
-    private void possessive$onRenderLevel(PostChain instance, FrameGraphBuilder frameGraphBuilder, int i, int j, PostChain.TargetBundle targetBundle, Consumer<RenderPass> consumer) {
+    private void possessive$onRenderLevel(PostChain instance, FrameGraphBuilder frameGraphBuilder, int i, int j, PostChain.TargetBundle targetBundle) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
             PossessiveModClient.cameraHandler.getCamera().onCameraShader(
                     instance,
                     frameGraphBuilder,
                     i, j,
-                    this.targets,
-                    consumer
+                    this.targets
             );
         } else {
-            instance.addToFrame(frameGraphBuilder, i, j, targetBundle, consumer);
+            instance.addToFrame(frameGraphBuilder, i, j, targetBundle);
         }
     }
 }

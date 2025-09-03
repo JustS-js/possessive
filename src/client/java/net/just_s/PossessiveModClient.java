@@ -3,6 +3,7 @@ package net.just_s;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.just_s.camera.CameraHandler;
+import net.just_s.camera.GameRendererAccess;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.KeyboardInput;
@@ -40,7 +41,7 @@ public class PossessiveModClient implements ClientModInitializer {
 				client.player.input = input;
 			}
 
-			client.gameRenderer.setRenderHand(cameraHandler.getCamera().shouldRenderHand());
+			((GameRendererAccess)client.gameRenderer).possessive$setRenderHand(cameraHandler.getCamera().shouldRenderHand());
 		}
 	}
 

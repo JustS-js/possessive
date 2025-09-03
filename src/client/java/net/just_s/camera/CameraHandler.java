@@ -23,7 +23,7 @@ public class CameraHandler {
         this.camera = newCamera;
 
         Minecraft client = Minecraft.getInstance();
-        client.gameRenderer.setRenderHand(newCamera.shouldRenderHand());
+        ((GameRendererAccess)client.gameRenderer).possessive$setRenderHand(newCamera.shouldRenderHand());
 
         if (client.gameRenderer.getMainCamera().isDetached()) {
             client.options.setCameraType(CameraType.FIRST_PERSON);
@@ -35,7 +35,7 @@ public class CameraHandler {
 
     public void disableCamera() {
         Minecraft client = Minecraft.getInstance();
-        client.gameRenderer.setRenderHand(true);
+        ((GameRendererAccess)client.gameRenderer).possessive$setRenderHand(true);
         client.setCameraEntity(client.player);
         if (camera != null) {
             camera.despawn();

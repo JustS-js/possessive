@@ -1,6 +1,7 @@
 package net.just_s.camera;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrbysco.armorposer.Reference;
 import com.mrbysco.armorposer.data.SyncData;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,6 +16,7 @@ import net.minecraft.client.model.ArmorStandArmorModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -26,6 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
@@ -33,6 +36,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class ArmorStandCamera extends AbstractCamera {
@@ -70,9 +74,13 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setRenderHand(true);
         this.setRenderBlockOutline(false);
 
-        CompoundTag compoundTag = this.getPossessed().saveWithoutId(new CompoundTag());
-        if (compoundTag.contains("Pose")) {
-            this.savePose(compoundTag.getCompoundOrEmpty("Pose"));
+        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, this.getPossessed().registryAccess());
+            this.getPossessed().saveWithoutId(output);
+            CompoundTag compoundTag = output.buildResult();
+            if (compoundTag.contains("Pose")) {
+                this.savePose(compoundTag.getCompoundOrEmpty("Pose"));
+            }
         }
     }
 
@@ -87,7 +95,13 @@ public class ArmorStandCamera extends AbstractCamera {
         float preHeadXRot = armorStand.getYRot();
         float preHeadYRot = 0;
 
-        CompoundTag compoundTag = armorStand.saveWithoutId(new CompoundTag());
+        CompoundTag compoundTag;
+        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, this.getPossessed().registryAccess());
+            this.getPossessed().saveWithoutId(output);
+            compoundTag = output.buildResult();
+        }
+
         if (compoundTag.contains("Rotation")) {
             ListTag rotationTag = compoundTag.getListOrEmpty("Rotation");
             preBodyYRot = rotationTag.getFloatOr(0, 0f);
@@ -190,7 +204,12 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     private CompoundTag generateCompoundFromCamera(double dx, double dy, double dz) {
-        CompoundTag original = possessedArmorStand.saveWithoutId(new CompoundTag());
+        CompoundTag original;
+        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, possessedArmorStand.registryAccess());
+            this.getPossessed().saveWithoutId(output);
+            original = output.buildResult();
+        }
         CompoundTag compoundTag = new CompoundTag();
 
         CompoundTag poseTag = new CompoundTag();
@@ -229,7 +248,13 @@ public class ArmorStandCamera extends AbstractCamera {
 
         this.putPossessionTag(compoundTag);
 
-        return possessedArmorStand.saveWithoutId(new CompoundTag()).merge(compoundTag);
+        CompoundTag toBeMergedWithCompoundTag;
+        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, possessedArmorStand.registryAccess());
+            this.getPossessed().saveWithoutId(output);
+            toBeMergedWithCompoundTag = output.buildResult();
+        }
+        return toBeMergedWithCompoundTag.merge(compoundTag);
     }
 
     private void putPossessionTag(CompoundTag compoundTag) {
@@ -336,7 +361,12 @@ public class ArmorStandCamera extends AbstractCamera {
 
     public void applySavedPose() {
         if (this.savedPose != null) {
-            CompoundTag compoundTag = possessedArmorStand.saveWithoutId(new CompoundTag());
+            CompoundTag compoundTag;
+            try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+                TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, possessedArmorStand.registryAccess());
+                this.getPossessed().saveWithoutId(output);
+                compoundTag = output.buildResult();
+            }
             compoundTag.put("Pose", this.savedPose);
             this.sendCompound(compoundTag);
         }
@@ -366,7 +396,12 @@ public class ArmorStandCamera extends AbstractCamera {
     public void despawn() {
         super.despawn();
 
-        CompoundTag compoundTag = this.possessedArmorStand.saveWithoutId(new CompoundTag());
+        CompoundTag compoundTag;
+        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, possessedArmorStand.registryAccess());
+            this.getPossessed().saveWithoutId(output);
+            compoundTag = output.buildResult();
+        }
         this.removePossessionTag(compoundTag);
         sendCompound(compoundTag);
     }
@@ -385,13 +420,9 @@ public class ArmorStandCamera extends AbstractCamera {
         ItemStack rightHandItemStack = possessedArmorStand.getMainHandItem();
 
         int x_mid = guiGraphics.guiWidth() / 2;
-        guiGraphics.pose().pushPose();
 
-        guiGraphics.pose().translate(0.0F, 0.0F, -90.0F);
-        guiGraphics.blitSprite(RenderType::guiTextured, ITEM_SLOT_SPRITE, x_mid - 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
-        guiGraphics.blitSprite(RenderType::guiTextured, ITEM_SLOT_SPRITE, x_mid + 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
-
-        guiGraphics.pose().popPose();
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, ITEM_SLOT_SPRITE, x_mid - 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, ITEM_SLOT_SPRITE, x_mid + 46 - 11, guiGraphics.guiHeight() - 22, 22, 22);
 
         int y = guiGraphics.guiHeight() - 16 - 3;
         if (!leftHandItemStack.isEmpty()) {
@@ -407,15 +438,15 @@ public class ArmorStandCamera extends AbstractCamera {
             float f = (float)itemStack.getPopTime() - deltaTracker.getGameTimeDeltaPartialTick(false);
             if (f > 0.0F) {
                 float g = 1.0F + f / 5.0F;
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate((float)(i + 8), (float)(j + 12), 0.0F);
-                guiGraphics.pose().scale(1.0F / g, (g + 1.0F) / 2.0F, 1.0F);
-                guiGraphics.pose().translate((float)(-(i + 8)), (float)(-(j + 12)), 0.0F);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate((float)(i + 8), (float)(j + 12));
+                guiGraphics.pose().scale(1.0F / g, (g + 1.0F) / 2.0F);
+                guiGraphics.pose().translate((float)(-(i + 8)), (float)(-(j + 12)));
             }
 
             guiGraphics.renderFakeItem(itemStack, i, j, k);
             if (f > 0.0F) {
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             }
 
             guiGraphics.renderItemDecorations(this.minecraft.font, itemStack, i, j);

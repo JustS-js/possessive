@@ -3,7 +3,7 @@
 uniform sampler2D MainSampler;
 uniform sampler2D MainDepthSampler;
 
-uniform float GameTime;
+#moj_import <minecraft:globals.glsl>
 
 in vec2 texCoord;
 in vec2 oneTexel;

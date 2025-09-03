@@ -20,6 +20,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Environment(EnvType.CLIENT)
 @Mixin(MultiPlayerGameMode.class)
 public class MultiPlayerGameModeMixin {
+
+    @Inject(method = "hasExperience", at = @At("HEAD"), cancellable = true)
+    private void possessive$onUseItemOn(CallbackInfoReturnable<Boolean> cir) {
+        if (PossessiveModClient.cameraHandler.isEnabled()) {
+            cir.setReturnValue(PossessiveModClient.cameraHandler.getCamera().isExperienceBarVisible());
+        }
+    }
+
     @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
     private void possessive$onUseItemOn(LocalPlayer player, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {

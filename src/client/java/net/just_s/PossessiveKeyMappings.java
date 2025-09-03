@@ -1,6 +1,7 @@
 package net.just_s;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mrbysco.armorposer.Reference;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -14,9 +15,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.xolt.freecam.Freecam;
 import org.lwjgl.glfw.GLFW;
 
@@ -98,7 +101,12 @@ public class PossessiveKeyMappings {
                     playGoodAttemptToPossess(player);
                 }
                 case ArmorStand armorStand -> {
-                    CompoundTag armorStandTag = armorStand.saveWithoutId(new CompoundTag());
+                    CompoundTag armorStandTag;
+                    try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+                        TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, armorStand.registryAccess());
+                        armorStand.saveWithoutId(output);
+                        armorStandTag = output.buildResult();
+                    }
                     int disabledSlotsAsFlag = armorStandTag.getIntOr("DisabledSlots", 0);
                     if (PossessiveModClient.isOccupiedFlag(disabledSlotsAsFlag)) {
                         playBadAttemptToPossess(armorStand);
@@ -165,7 +173,12 @@ public class PossessiveKeyMappings {
         }
 
         while (savePoseKeyMapping.consumeClick()) {
-            CompoundTag compoundTag = camera.getPossessed().saveWithoutId(new CompoundTag());
+            CompoundTag compoundTag;
+            try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(Reference.LOGGER)) {
+                TagValueOutput output = TagValueOutput.createWithContext(problemreporter$scopedcollector, camera.getPossessed().registryAccess());
+                camera.getPossessed().saveWithoutId(output);
+                compoundTag = output.buildResult();
+            }
             if (compoundTag.contains("Pose")) {
                 camera.savePose(compoundTag.getCompoundOrEmpty("Pose"));
                 Minecraft.getInstance().gui.setOverlayMessage(Component.translatable("possessive.message.save_pose"), false);

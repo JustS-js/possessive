@@ -1,7 +1,6 @@
 {
   "targets": {
-    "final": {},
-    "swap": {}
+    "final": {}
   },
   "passes": [
     {
@@ -63,7 +62,7 @@
           "use_depth_buffer": true
         }
       ],
-      "output": "swap"
+      "output": "final"
     },
     {
       "vertex_shader": "minecraft:post/blit",
@@ -71,32 +70,12 @@
       "inputs": [
         {
           "sampler_name": "Main",
-          "target": "swap"
+          "target": "final"
         },
         {
           "sampler_name": "MainDepth",
           "target": "minecraft:main",
           "use_depth_buffer": true
-        }
-      ],
-      "output": "final",
-      "uniforms": [
-      ]
-    },
-    {
-      "vertex_shader": "minecraft:post/blit",
-      "fragment_shader": "minecraft:post/blit",
-      "inputs": [
-        {
-          "sampler_name": "In",
-          "target": "final"
-        }
-      ],
-      "uniforms": [
-        {
-          "name": "ColorModulate",
-          "type": "vec4",
-          "values": [ 1.0, 1.0, 1.0, 1.0 ]
         }
       ],
       "output": "minecraft:main"

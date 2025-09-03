@@ -26,6 +26,7 @@ import net.minecraft.server.ServerLinks;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -75,7 +76,7 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     public AbstractCamera(Minecraft client, int id) {
-        super(client, client.level, NETWORK_HANDLER, client.player.getStats(), client.player.getRecipeBook(), false, false);
+        super(client, client.level, NETWORK_HANDLER, client.player.getStats(), client.player.getRecipeBook(), Input.EMPTY, false);
 
         // Not to interfere with real entities in world. Should be negative.
         setId(id);
@@ -178,8 +179,8 @@ public abstract class AbstractCamera extends LocalPlayer {
      * for your shader.
      * For examples see assets/post_shader/astral.json
      */
-    public void onCameraShader(PostChain instance, FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle, Consumer<RenderPass> consumer) {
-        instance.addToFrame(frameGraphBuilder, width, height, targetBundle, consumer);
+    public void onCameraShader(PostChain instance, FrameGraphBuilder frameGraphBuilder, int width, int height, PostChain.TargetBundle targetBundle) {
+        instance.addToFrame(frameGraphBuilder, width, height, targetBundle);
     }
 
     // copied from PlayerRenderer.renderHand()

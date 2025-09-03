@@ -21,11 +21,4 @@ public class GuiMixin {
             }
         }
     }
-
-    @Inject(method = "isExperienceBarVisible", at = @At("HEAD"), cancellable = true)
-    private void possessive$isExperienceBarVisible(CallbackInfoReturnable<Boolean> cir) {
-        if (PossessiveModClient.cameraHandler.isEnabled()) {
-            cir.setReturnValue(PossessiveModClient.cameraHandler.getCamera().isExperienceBarVisible());
-        }
-    }
 }
