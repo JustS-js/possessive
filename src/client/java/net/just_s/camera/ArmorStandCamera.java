@@ -1,9 +1,11 @@
 package net.just_s.camera;
 
+import com.danrus.pas.render.PlayerArmorStandModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.armorposer.data.SyncData;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.just_s.PossessiveModClient;
 import net.just_s.mixin.client.LocalPlayerAccessor;
 import net.minecraft.client.DeltaTracker;
@@ -69,7 +71,7 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setPushable(true);
         this.setAbilityToChangePerspective(true);
         this.setRenderHand(true);
-        this.setRenderBlockOutline(true);
+        this.setRenderBlockOutline(false);
 
         CompoundTag compoundTag = this.getPossessed().saveWithoutId(new CompoundTag());
         if (compoundTag.contains("Pose")) {
@@ -323,9 +325,9 @@ public class ArmorStandCamera extends AbstractCamera {
 
         ModelPart armorStandArm;
         if (modelPart.equals(playerModel.rightArm)) {
-            armorStandArm = armorStandModel.rightArm;
+            armorStandArm = (FabricLoader.getInstance().isModLoaded("pas")) ? ((PlayerArmorStandModel)armorStandModel).originalRightArm : armorStandModel.rightArm;
         } else {
-            armorStandArm = armorStandModel.leftArm;
+            armorStandArm = (FabricLoader.getInstance().isModLoaded("pas")) ? ((PlayerArmorStandModel)armorStandModel).originalLeftArm :armorStandModel.leftArm;
         }
         armorStandArm.resetPose();
         armorStandArm.visible = true;

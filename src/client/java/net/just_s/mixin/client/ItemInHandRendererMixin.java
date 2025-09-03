@@ -1,5 +1,7 @@
 package net.just_s.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,11 +15,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ItemInHandRenderer.class)
@@ -25,52 +25,49 @@ public class ItemInHandRendererMixin {
 
     @Unique private float possessive$tickDelta;
 
-    @Redirect(method = "renderHandsWithItems", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection;renderMainHand:Z"))
-    private boolean possessive$shouldRenderItemInMainHand(ItemInHandRenderer.HandRenderSelection instance) {
-        boolean value = instance.renderMainHand;
-        if (PossessiveModClient.cameraHandler.isEnabled()) {
-            return PossessiveModClient.cameraHandler.getCamera().shouldRenderItemInMainHand(value);
+    @Inject(
+            method = "renderHandsWithItems",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/Mth;lerp(FFF)F",
+                    ordinal = 1
+            )
+    )
+    private void possessive$replaceBooleansForRenderingHands(float f, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, LocalPlayer localPlayer, int i, CallbackInfo ci, @Local LocalRef<ItemInHandRenderer.HandRenderSelection> localRef){
+        // if mod not in use then just skip it altogether
+        if (!PossessiveModClient.cameraHandler.isEnabled()) {
+            return;
         }
-        return value;
-    }
+        boolean finalShouldRenderMainHand = PossessiveModClient.cameraHandler.getCamera().shouldRenderItemInMainHand(localRef.get().renderMainHand);
+        boolean finalShouldRenderOffHand = PossessiveModClient.cameraHandler.getCamera().shouldRenderItemInOffHand(localRef.get().renderOffHand);
 
-    @Redirect(method = "renderHandsWithItems", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection;renderOffHand:Z"))
-    private boolean possessive$shouldRenderItemInOffHand(ItemInHandRenderer.HandRenderSelection instance){
-        boolean value = instance.renderOffHand;
-        if (PossessiveModClient.cameraHandler.isEnabled()) {
-            return PossessiveModClient.cameraHandler.getCamera().shouldRenderItemInOffHand(value);
+        if (finalShouldRenderMainHand && finalShouldRenderOffHand) {
+            localRef.set(ItemInHandRenderer.HandRenderSelection.RENDER_BOTH_HANDS);
+        } else if (finalShouldRenderMainHand) {
+            localRef.set(ItemInHandRenderer.HandRenderSelection.RENDER_MAIN_HAND_ONLY);
+        } else if (finalShouldRenderOffHand) {
+            localRef.set(ItemInHandRenderer.HandRenderSelection.RENDER_OFF_HAND_ONLY);
         }
-        return value;
     }
 
     @Inject(method = "renderHandsWithItems", at = @At("HEAD"))
-    private void possessive$storeTickDelta(float tickDelta, PoseStack matrices, MultiBufferSource.BufferSource vertexConsumers, LocalPlayer player, int light, CallbackInfo ci) {
-        this.possessive$tickDelta = tickDelta;
+    private void storeTickDelta(float tickDelta, PoseStack matrices, MultiBufferSource.BufferSource vertexConsumers, LocalPlayer player, int light, CallbackInfo ci) {
+        possessive$tickDelta = tickDelta;
     }
 
-    @ModifyVariable(method = "renderHandsWithItems", at = @At("HEAD"), argsOnly = true)
-    private int possessive$getLight(int light) {
-        if (PossessiveModClient.cameraHandler.isEnabled()) {
-            return Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(PossessiveModClient.cameraHandler.getCamera(), possessive$tickDelta);
-        }
-        return light;
-    }
-
-    @Redirect(
+    @ModifyArgs(
             method = "renderHandsWithItems",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"
-            ),
-            require = 0
+            )
     )
-    private void possessive$onRenderHandsWithItems(ItemInHandRenderer instance, AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j){
+    private void possessive$replaceItemToRender(Args args){
         if (PossessiveModClient.cameraHandler.isEnabled()) {
-            instance.renderArmWithItem(abstractClientPlayer, f, h, interactionHand, h,
-                    PossessiveModClient.cameraHandler.getCamera().getItemToRender(interactionHand),
-                    i, poseStack, multiBufferSource, j);
-            return;
+            // 3rd arg is InteractionHand, 5th arg is ItemStack
+            args.set(5, PossessiveModClient.cameraHandler.getCamera().getItemToRender(args.get(3)));
+            // 9th arg is light level
+            args.set(9, Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(PossessiveModClient.cameraHandler.getCamera(), possessive$tickDelta));
         }
-        instance.renderArmWithItem(abstractClientPlayer, f, h, interactionHand, h, itemStack, i, poseStack, multiBufferSource, j);
     }
 }

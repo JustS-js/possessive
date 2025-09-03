@@ -6,9 +6,7 @@ import net.just_s.PossessiveModClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -45,6 +43,14 @@ public class MinecraftMixin {
             return PossessiveModClient.cameraHandler.getCamera().onSetScreen(value);
         }
         return value;
+    }
+
+    @ModifyConstant(method = "handleKeybinds", constant = @Constant(intValue = 9))
+    private int restrictHotbarSwitchingWithKeys(int constant) {
+        if (PossessiveModClient.cameraHandler.isEnabled()) {
+            return 0;
+        }
+        return constant;
     }
 
     // Disables Camera if the player disconnects.

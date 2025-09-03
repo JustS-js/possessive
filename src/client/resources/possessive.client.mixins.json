@@ -5,6 +5,7 @@
   "client": [
     "ClientPacketListenerMixin",
     "EntityMixin",
+    "FreecamCompatMixin",
     "GameRendererMixin",
     "GuiMixin",
     "ItemInHandRendererMixin",
@@ -13,6 +14,7 @@
     "LocalPlayerAccessor",
     "LocalPlayerMixin",
     "MinecraftMixin",
+    "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OptionsMixin",
     "PlayerRendererMixin",

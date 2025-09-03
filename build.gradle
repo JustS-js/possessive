@@ -15,6 +15,10 @@ repositories {
 		name "saps"
 		url "https://maven.saps.dev/releases"
 	}
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
 }
 
 loom {
@@ -40,7 +44,9 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	implementation "com.mrbysco.armorposer:ArmorPoser-common-${project.minecraft_version}:${project.armor_poser_version}"
-	
+
+	modCompileOnly "maven.modrinth:freecam:${project.freecam_version}"
+	modCompileOnly "maven.modrinth:player-armor-stands:${project.pas_version}"
 }
 
 processResources {
