@@ -4,6 +4,7 @@ import com.danrus.render.models.PASModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.armorposer.Reference;
 import com.mrbysco.armorposer.data.SyncData;
+import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.loader.api.FabricLoader;
@@ -186,13 +187,11 @@ public class ArmorStandCamera extends AbstractCamera {
     }
 
     private void sendCompound(CompoundTag armorStandCompound) {
-        FriendlyByteBuf buf = PacketByteBufs.create();
         SyncData data = new SyncData(
                 possessedArmorStand.getUUID(),
                 armorStandCompound
         );
-        data.encode(buf);
-        ClientPlayNetworking.send(Reference.SYNC_PACKET_ID, buf);
+        ClientPlayNetworking.send(new ArmorStandSyncPayload(data));
     }
 
     private CompoundTag generateCompoundFromCamera(double dx, double dy, double dz) {

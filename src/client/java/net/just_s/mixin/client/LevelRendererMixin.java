@@ -1,5 +1,7 @@
 package net.just_s.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -46,11 +49,11 @@ public abstract class LevelRendererMixin {
         }
     }
 
-    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void possessive$renderPlayer(PoseStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightmapTextureManager, Matrix4f positionMatrix, CallbackInfo ci) {
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 0))
+    private void possessive$renderPlayer(float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci, @Local PoseStack poseStack) {
         if (PossessiveModClient.cameraHandler.isEnabled()) {
             Vec3 cameraPos = camera.getPosition();
-            renderEntity(Minecraft.getInstance().player, cameraPos.x, cameraPos.y, cameraPos.z, tickDelta, matrices, renderBuffers.bufferSource());
+            renderEntity(Minecraft.getInstance().player, cameraPos.x, cameraPos.y, cameraPos.z, f, poseStack, renderBuffers.bufferSource());
         }
     }
 

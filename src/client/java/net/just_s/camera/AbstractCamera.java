@@ -51,7 +51,10 @@ public abstract class AbstractCamera extends LocalPlayer {
                         FeatureFlagSet.of(),
                         null,
                         Minecraft.getInstance().getCurrentServer(),
-                        Minecraft.getInstance().screen
+                        Minecraft.getInstance().screen,
+                        Collections.emptyMap(),
+                        Minecraft.getInstance().gui.getChat().storeState(),
+                        false
                 )
         ) {
             @Override
