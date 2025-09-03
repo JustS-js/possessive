@@ -7,10 +7,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.InteractionHand;
@@ -41,11 +43,16 @@ public abstract class AbstractCamera extends LocalPlayer {
     static {
         NETWORK_HANDLER = new ClientPacketListener(
                 Minecraft.getInstance(),
-                Minecraft.getInstance().screen,
                 Minecraft.getInstance().getConnection().getConnection(),
-                Minecraft.getInstance().getCurrentServer(),
-                new GameProfile(UUID.randomUUID(), "Camera"),
-                Minecraft.getInstance().getTelemetryManager().createWorldSessionManager(false, null, null)
+                new CommonListenerCookie(
+                        new GameProfile(UUID.randomUUID(), "Camera"),
+                        Minecraft.getInstance().getTelemetryManager().createWorldSessionManager(false, null, null),
+                        RegistryAccess.Frozen.EMPTY,
+                        FeatureFlagSet.of(),
+                        null,
+                        Minecraft.getInstance().getCurrentServer(),
+                        Minecraft.getInstance().screen
+                )
         ) {
             @Override
             public void send(Packet<?> packet) {
@@ -68,7 +75,7 @@ public abstract class AbstractCamera extends LocalPlayer {
 
     public void spawn() {
         if (clientLevel != null) {
-            clientLevel.addPlayer(Integer.MAX_VALUE - 5, this);
+            clientLevel.addEntity(this);
         }
     }
 

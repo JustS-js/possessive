@@ -46,7 +46,7 @@ public class AstralProjectionCamera extends AbstractCamera {
             position.moveForward(negative ? -1 * increment : increment);
             applyPosition(position);
 
-            if (!canEnterPose(getPose())) {
+            if (!wouldNotSuffocateAtTargetPose(getPose())) {
                 // Revert to last non-colliding position and return whether we were unable to move at all
                 applyPosition(oldPosition);
                 return distance > 0;

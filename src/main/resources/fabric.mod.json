@@ -27,10 +27,10 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.9",
-		"minecraft": ">=1.20",
+		"minecraft": ">=1.20.2",
 		"java": ">=17",
 		"fabric-api": "*",
-		"armorposer": ">=2.2.2"
+		"armorposer": ">=3.0.0"
 	},
 	"accessWidener" : "possessive.accesswidener"
 }
