@@ -5,6 +5,7 @@
   "client": [
     "ClientPacketListenerMixin",
     "EntityMixin",
+    "FreecamCompatMixin",
     "GameRendererMixin",
     "GuiMixin",
     "ItemInHandRendererMixin",
