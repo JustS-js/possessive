@@ -70,7 +70,7 @@ public class ArmorStandCamera extends AbstractCamera {
         this.setPushable(true);
         this.setAbilityToChangePerspective(true);
         this.setRenderHand(true);
-        this.setRenderBlockOutline(true);
+        this.setRenderBlockOutline(false);
 
         CompoundTag compoundTag = this.getPossessed().saveWithoutId(new CompoundTag());
         if (compoundTag.contains("Pose")) {

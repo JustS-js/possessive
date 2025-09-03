@@ -22,6 +22,13 @@ public class GuiMixin {
         }
     }
 
+    @Inject( method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true )
+    private void possessive$disableRenderPlayerHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (PossessiveModClient.cameraHandler.isEnabled()) {
+            ci.cancel();
+        }
+    }
+
     @Redirect(
             method = "render",
             at = @At(

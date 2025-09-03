@@ -3,6 +3,7 @@ package net.just_s;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.just_s.camera.ArmorStandCamera;
 import net.just_s.camera.AstralProjectionCamera;
 import net.minecraft.client.KeyMapping;
@@ -17,6 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.xolt.freecam.Freecam;
 import org.lwjgl.glfw.GLFW;
 
 public class PossessiveKeyMappings {
@@ -60,6 +62,10 @@ public class PossessiveKeyMappings {
         while (possessKeyMapping.consumeClick()) {
             if (client.options.keyShift.isDown()) {
                 if (isAstral) {
+                    return;
+                }
+                // Forbid astral projecting while in the Freecam
+                if (FabricLoader.getInstance().isModLoaded("freecam") && Freecam.isEnabled()) {
                     return;
                 }
                 PossessiveModClient.cameraHandler.enableCamera(
