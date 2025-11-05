@@ -1,16 +1,16 @@
 {
+  "key.category.possessive.possessive": "Possessive",
   "key.possessive.possess": "Possess",
   "key.possessive.save_pose": "Save ArmorStand's Pose",
   "key.possessive.load_pose": "Restore ArmorStand's Pose",
-  "category.possessive": "Possessive",
-  "possessive.message.vessel_fail": "The Vessel rejects You.",
-  "possessive.message.vessel_success": "The Vessel accepts You.",
-  "possessive.message.vessel_empty": "You are fragmented.",
-  "possessive.message.vessel_broken": "The Vessel is broken.",
   "possessive.message.save_pose": "Pose Saved.",
   "possessive.message.load_pose": "Pose Restored.",
-  "armorposer.gui.label.animate_button": "Animate Movement",
+  "possessive.message.vessel_fail": "The Vessel rejects You.",
+  "possessive.message.vessel_empty": "You are fragmented.",
+  "possessive.message.vessel_broken": "The Vessel is broken.",
+  "possessive.message.vessel_success": "The Vessel accepts You.",
   "armorposer.gui.label.sync_button": "Sync",
-  "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand",
-  "armorposer.gui.tooltip.sync_button": "Synchronize Armor Stand's position with your camera"
+  "armorposer.gui.label.animate_button": "Animate Movement",
+  "armorposer.gui.tooltip.sync_button": "Synchronize Armor Stand's position with your camera",
+  "armorposer.gui.tooltip.animate_button": "Animate arms and legs when moving possessed Armor Stand"
 }

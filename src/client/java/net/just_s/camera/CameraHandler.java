@@ -13,7 +13,7 @@ public class CameraHandler {
     }
 
     public boolean isEnabled() {
-        return camera != null && camera.equals(Minecraft.getInstance().cameraEntity);
+        return camera != null && camera.equals(Minecraft.getInstance().getCameraEntity());
     }
 
     public void enableCamera(AbstractCamera newCamera) {

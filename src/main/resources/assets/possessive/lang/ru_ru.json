@@ -1,16 +1,16 @@
 {
-  "armorposer.gui.label.animate_button": "Анимировать движение",
-  "armorposer.gui.tooltip.animate_button": "Анимировать руки и ноги при движении одержимой стойки для брони",
-  "category.possessive": "Possessive",
-  "key.possessive.load_pose": "Восстановить позу Стойки",
+  "key.category.possessive.possessive": "Possessive",
   "key.possessive.possess": "Вселиться",
   "key.possessive.save_pose": "Сохранить позу Стойки",
-  "possessive.message.load_pose": "Поза восстановлена.",
+  "key.possessive.load_pose": "Восстановить позу Стойки",
   "possessive.message.save_pose": "Поза сохранена.",
-  "possessive.message.vessel_broken": "Сосуд разрушен.",
-  "possessive.message.vessel_empty": "Вы фрагментированы.",
+  "possessive.message.load_pose": "Поза восстановлена.",
   "possessive.message.vessel_fail": "Сосуд отвергает Вас.",
+  "possessive.message.vessel_empty": "Вы фрагментированы.",
+  "possessive.message.vessel_broken": "Сосуд разрушен.",
   "possessive.message.vessel_success": "Сосуд принимает Вас.",
   "armorposer.gui.label.sync_button": "Синхронизировать",
-  "armorposer.gui.tooltip.sync_button": "Синхронизировать позицию стойки для брони с Вашей камерой"
+  "armorposer.gui.label.animate_button": "Анимировать движение",
+  "armorposer.gui.tooltip.sync_button": "Синхронизировать позицию стойки для брони с Вашей камерой",
+  "armorposer.gui.tooltip.animate_button": "Анимировать руки и ноги при движении одержимой стойки для брони"
 }

@@ -43,7 +43,7 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	implementation "com.mrbysco.armorposer:ArmorPoser-common-${project.minecraft_version}:${project.armor_poser_version}"
+	implementation "com.mrbysco.armorposer:ArmorPoser-common-1.21.9:${project.armor_poser_version}"
 
 	modCompileOnly "maven.modrinth:freecam:${project.freecam_version}"
 }

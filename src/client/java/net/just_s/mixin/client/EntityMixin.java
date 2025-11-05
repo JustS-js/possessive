@@ -19,7 +19,7 @@ public class EntityMixin {
     @Inject(method = "turn", at = @At("HEAD"), cancellable = true)
     private void possessive$onTurn(double x, double y, CallbackInfo ci) {
         if (PossessiveModClient.cameraHandler.isEnabled() && this.equals(Minecraft.getInstance().player)) {
-            Minecraft.getInstance().cameraEntity.turn(x, y);
+            Minecraft.getInstance().getCameraEntity().turn(x, y);
             ci.cancel();
         }
     }
@@ -27,8 +27,8 @@ public class EntityMixin {
     // Prevents Camera from pushing/getting pushed by entities.
     @Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void possessive$onPush(Entity entity, CallbackInfo ci) {
-        boolean cameraInteraction = (entity.equals(Minecraft.getInstance().cameraEntity) ||
-                this.equals(Minecraft.getInstance().cameraEntity));
+        boolean cameraInteraction = (entity.equals(Minecraft.getInstance().getCameraEntity()) ||
+                this.equals(Minecraft.getInstance().getCameraEntity()));
         if (PossessiveModClient.cameraHandler.isEnabled() && cameraInteraction) {
             ci.cancel();
         }

@@ -13,6 +13,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ProblemReporter;
@@ -27,13 +28,18 @@ public class PossessiveKeyMappings {
     private static KeyMapping possessKeyMapping;
     private static KeyMapping savePoseKeyMapping;
     private static KeyMapping loadPoseKeyMapping;
+    private static final KeyMapping.Category posessiveCategory = KeyMapping.Category.register(
+            ResourceLocation.fromNamespaceAndPath(
+                    PossessiveModClient.MOD_ID, "possessive"
+            )
+    );
 
     public static void registerModKeyMappings() {
         possessKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.possessive.possess", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_R, // The keycode of the key
-                "category.possessive" // The translation key of the keybinding's category.
+                posessiveCategory // The translation key of the keybinding's category.
         ));
         ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::possessKeyPress);
 
@@ -41,7 +47,7 @@ public class PossessiveKeyMappings {
                 "key.possessive.save_pose",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_LEFT_BRACKET,
-                "category.possessive"
+                posessiveCategory
         ));
         ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::savePoseKeyPress);
 
@@ -49,7 +55,7 @@ public class PossessiveKeyMappings {
                 "key.possessive.load_pose",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_RIGHT_BRACKET,
-                "category.possessive"
+                posessiveCategory
         ));
         ClientTickEvents.END_CLIENT_TICK.register(PossessiveKeyMappings::loadPoseKeyPress);
     }
@@ -70,7 +76,7 @@ public class PossessiveKeyMappings {
                     return;
                 }
                 PossessiveModClient.cameraHandler.enableCamera(
-                        new AstralProjectionCamera(client, client.cameraEntity)
+                        new AstralProjectionCamera(client, client.getCameraEntity())
                 );
                 playFeedback(
                         PossessiveModClient.cameraHandler.getCamera(),
@@ -142,7 +148,7 @@ public class PossessiveKeyMappings {
     }
 
     private static void playFeedback(Entity entity, ParticleOptions particleOptions, SoundEvent soundEvent, float volume, float pitch, String translatable) {
-        Entity camera = Minecraft.getInstance().cameraEntity;
+        Entity camera = Minecraft.getInstance().getCameraEntity();
         for(int i = 0; i < 20; ++i) {
             double d = camera.getRandom().nextGaussian() * 0.02;
             double e = camera.getRandom().nextGaussian() * 0.02;

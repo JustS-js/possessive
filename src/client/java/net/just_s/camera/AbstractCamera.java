@@ -10,16 +10,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
+import net.minecraft.client.multiplayer.LevelLoadTracker;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerLinks;
@@ -55,17 +59,34 @@ public abstract class AbstractCamera extends LocalPlayer {
                 Minecraft.getInstance(),
                 Minecraft.getInstance().getConnection().getConnection(),
                 new CommonListenerCookie(
-                        new GameProfile(UUID.randomUUID(), "Camera"),
+                        // levelLoadTracker
+                        new LevelLoadTracker(),
+                        // localGameProfile
+                        new GameProfile(UUID.randomUUID(), "FreeCamera"),
+                        // worldSessionTelemetryManager
                         Minecraft.getInstance().getTelemetryManager().createWorldSessionManager(false, null, null),
+                        // receivedRegistries
                         Minecraft.getInstance().player.registryAccess().freeze(),
+                        // enabledFeatures
                         FeatureFlagSet.of(),
+                        // serverBrand
                         null,
-                        Minecraft.getInstance().getCurrentServer(),
-                        Minecraft.getInstance().screen,
+                        // serverData
+                        null,
+                        // postDisconnectScreen
+                        null,
+                        // serverCookies
                         Collections.emptyMap(),
-                        Minecraft.getInstance().gui.getChat().storeState(),
+                        // chatState
+                        null,
+                        // customReportDetails
                         Collections.emptyMap(),
-                        ServerLinks.EMPTY
+                        // serverLinks
+                        ServerLinks.EMPTY,
+                        // seenPlayers
+                        Collections.emptyMap(),
+                        // seenInsecureChatWarning
+                        false
                 )
         ) {
             @Override
@@ -90,14 +111,12 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     public void spawn() {
-        if (clientLevel != null) {
-            clientLevel.addEntity(this);
-        }
+        ((ClientLevel) level()).addEntity(this);
     }
 
     public void despawn() {
-        if (clientLevel != null && clientLevel.getEntity(getId()) != null) {
-            clientLevel.removeEntity(getId(), RemovalReason.DISCARDED);
+        if (level().getEntity(getId()) != null) {
+            ((ClientLevel) level()).removeEntity(getId(), RemovalReason.DISCARDED);
         }
     }
 
@@ -184,10 +203,10 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     // copied from PlayerRenderer.renderHand()
-    public void onRenderHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl) {
+    public void onRenderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl) {
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         LocalPlayer entityToRender = Minecraft.getInstance().player;
-        PlayerRenderer entityRenderer = (PlayerRenderer) entityRenderDispatcher.getRenderer(entityToRender);
+        AvatarRenderer<LocalPlayer> entityRenderer = (AvatarRenderer<LocalPlayer>) entityRenderDispatcher.getRenderer(entityToRender);
 
         PlayerModel playerModel = entityRenderer.getModel();
         modelPart.resetPose();
@@ -196,7 +215,7 @@ public abstract class AbstractCamera extends LocalPlayer {
         playerModel.rightSleeve.visible = bl;
         playerModel.leftArm.zRot = -0.1F;
         playerModel.rightArm.zRot = 0.1F;
-        modelPart.render(poseStack, multiBufferSource.getBuffer(RenderType.entityTranslucent(resourceLocation)), i, OverlayTexture.NO_OVERLAY);
+        submitNodeCollector.submitModelPart(modelPart, poseStack, RenderType.entityTranslucent(resourceLocation), i, OverlayTexture.NO_OVERLAY, (TextureAtlasSprite)null);
     }
 
     public boolean onSendPosition() {
