@@ -2,13 +2,12 @@ package net.just_s.camera;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -16,16 +15,15 @@ import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.multiplayer.LevelLoadTracker;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerLinks;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -42,7 +40,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 // heavily (absolutely) inspired by (stripped from) freecam https://github.com/MinecraftFreecam/Freecam
@@ -102,7 +99,7 @@ public abstract class AbstractCamera extends LocalPlayer {
         // Not to interfere with real entities in world. Should be negative.
         setId(id);
         // Otherwise input is frozen until timeout
-        setClientLoaded(true);
+        connection.setClientLoaded(true);
         input = new KeyboardInput(client.options);
     }
 
@@ -203,7 +200,7 @@ public abstract class AbstractCamera extends LocalPlayer {
     }
 
     // copied from PlayerRenderer.renderHand()
-    public void onRenderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl) {
+    public void onRenderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, Identifier resourceLocation, ModelPart modelPart, boolean bl) {
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         LocalPlayer entityToRender = Minecraft.getInstance().player;
         AvatarRenderer<LocalPlayer> entityRenderer = (AvatarRenderer<LocalPlayer>) entityRenderDispatcher.getRenderer(entityToRender);
@@ -215,7 +212,7 @@ public abstract class AbstractCamera extends LocalPlayer {
         playerModel.rightSleeve.visible = bl;
         playerModel.leftArm.zRot = -0.1F;
         playerModel.rightArm.zRot = 0.1F;
-        submitNodeCollector.submitModelPart(modelPart, poseStack, RenderType.entityTranslucent(resourceLocation), i, OverlayTexture.NO_OVERLAY, (TextureAtlasSprite)null);
+        submitNodeCollector.submitModelPart(modelPart, poseStack, RenderTypes.entityTranslucent(resourceLocation), i, OverlayTexture.NO_OVERLAY, (TextureAtlasSprite)null);
     }
 
     public boolean onSendPosition() {

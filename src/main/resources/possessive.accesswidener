@@ -1,4 +1,5 @@
 accessWidener v2 named
+accessible method net/minecraft/client/multiplayer/ClientPacketListener setClientLoaded (Z)V
 accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
 accessible field net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection renderMainHand Z
 accessible field net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection renderOffHand Z

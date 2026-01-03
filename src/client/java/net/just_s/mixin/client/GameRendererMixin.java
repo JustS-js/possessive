@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class GameRendererMixin implements GameRendererAccess {
 
     @Unique
-    private boolean possessive$hideHand = true;
+    private boolean possessive$hideHand = false;
 
     @Override
     public void possessive$setRenderHand(boolean bl) {

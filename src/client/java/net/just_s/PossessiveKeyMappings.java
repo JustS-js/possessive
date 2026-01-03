@@ -13,7 +13,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ProblemReporter;
@@ -29,7 +29,7 @@ public class PossessiveKeyMappings {
     private static KeyMapping savePoseKeyMapping;
     private static KeyMapping loadPoseKeyMapping;
     private static final KeyMapping.Category posessiveCategory = KeyMapping.Category.register(
-            ResourceLocation.fromNamespaceAndPath(
+            Identifier.fromNamespaceAndPath(
                     PossessiveModClient.MOD_ID, "possessive"
             )
     );
